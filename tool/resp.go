@@ -5,6 +5,12 @@ import (
 	"net/http"
 )
 
+func RespErrorWithNoRows(c *gin.Context)  {
+	c.JSON(http.StatusOK,gin.H{
+		"info":"账号不存在",
+	})
+}
+
 func RespErrorWithDate(c *gin.Context, date interface{}) {
 	c.JSON(http.StatusOK, gin.H{
 		"info": date,
