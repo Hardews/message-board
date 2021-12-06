@@ -9,7 +9,7 @@ func CheckPassword(username,password string)  (bool,error){
 	 err,user := dao.SelectByUsername(username)
 	 if err!=nil{
 		 if err==sql.ErrNoRows {
-			 return false,nil
+			 return false,sql.ErrNoRows
 		 }else {
 			 return false,err
 		 }

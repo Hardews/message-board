@@ -15,13 +15,16 @@ func Login(c *gin.Context) {
 	password := c.PostForm("password")
 	res,err :=service.CheckPassword(username,password)
 	if err != nil{
-		switch err {
-		case sql.ErrNoRows: c.JSON(http.StatusOK,gin.H{
+		switch  {
+		case res==false && err==sql.ErrNoRows:
+			c.JSON(http.StatusOK,gin.H{
 			"info":"无此账号",
 		})
+			return
 		default:fmt.Println(err)
 		        tool.RespInternetError(c)
 		}
+		return
 	}
 	if res{
 		tool.RespSuccessful(c)
