@@ -20,4 +20,20 @@ func CheckPassword(username,password string)  (bool,error){
 	return true,nil
 }
 
+func CheckUsername(username string)  (error,bool){
+     err,user := dao.SelectByUsername(username)
+	 if err != nil{
+		 if err == sql.ErrNoRows{
+			 err = nil
+			 return err,true
+		 }else {
+			 return err,false
+		 }
+	 }
+	 if user.Username == username{
+		 return nil,false
+	 }
+	 return nil,true
+}
+
 

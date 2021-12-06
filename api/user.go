@@ -8,7 +8,6 @@ import (
 	"message-board/service"
 	"message-board/tool"
 	"net/http"
-	"time"
 )
 
 func Login(c *gin.Context) {
@@ -36,7 +35,31 @@ func Login(c *gin.Context) {
 }
 
 func Register(c *gin.Context) {
-
+	username := c.PostForm("username")
+	password := c.PostForm("password")
+	err,res := service.CheckUsername(username)
+	switch  {
+	case err == nil && res == false:
+		c.JSON(http.StatusOK,gin.H{
+		"info":"用户名已存在",
+	})
+		return
+	case err !=nil && res == false:
+		fmt.Println("CheckUsername failed , err : ",err)
+		return
+	}
+	if len(password)<6 {
+		c.JSON(http.StatusOK,gin.H{
+			"info":"密码过短",
+		})
+		return
+	}
+	err = dao.WriteIn(username,password)
+	if err!=nil{
+		fmt.Println("insert failed, err :",err)
+		return
+	}
+	tool.RespSuccessful(c)
 }
 
 func replacePassword(c *gin.Context) {
