@@ -3,10 +3,11 @@ package dao
 import (
 	"database/sql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"message-board/model"
 )
 
-var db,err = sql.Open("mysql","root:lmh123@tcp(127.0.0.1:3306)/user")
+var db,err = sql.Open("mysql","root:lmh123@tcp(127.0.0.1:3306)/userdata")
 
 func InitDB()  {
 	if err != nil{
