@@ -7,6 +7,7 @@ import (
 	"message-board/dao"
 	"message-board/service"
 	"message-board/tool"
+	"net/http"
 )
 
 func Login(c *gin.Context) {
@@ -75,6 +76,12 @@ func changePassword(c *gin.Context) {
 	}
 	if !res {
 		tool.RespErrorWithDate(c, "旧密码错误")
+		return
+	}
+	if len(newPassword) < 6 {
+		c.JSON(http.StatusOK, gin.H{
+			"info": "密码过短",
+		})
 		return
 	}
 	err = dao.ChangePassword(username, newPassword)

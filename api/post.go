@@ -37,7 +37,6 @@ func GetPost(c *gin.Context) {
 	for i, _ := range user {
 		tool.RespSuccessfulWithUsernameAndDate(c, username, user[i])
 	}
-
 }
 
 func DeletePost(c *gin.Context) {
@@ -50,6 +49,30 @@ func DeletePost(c *gin.Context) {
 		return
 	}
 	tool.RespSuccessful(c)
+}
+
+func changePost(c *gin.Context) {
+	iUsername, _ := c.Get("username")
+	username := iUsername.(string)
+	err, _ := dao.GetPost(username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			tool.RespErrorWithDate(c, "无留言")
+			return
+		}
+		fmt.Println("select post failed , err :", err)
+		tool.RespInternetError(c)
+		return
+	}
+
+	newPost := c.PostForm("newPost")
+	err = dao.ChangePost(username, newPost)
+	if err != nil {
+		fmt.Println("changePost failed, err :", err)
+		tool.RespInternetError(c)
+		return
+	}
+	tool.RespSuccessfulWithUsernameAndDate(c, username, "更改留言成功")
 }
 
 func getAllPost(c *gin.Context) {

@@ -21,7 +21,6 @@ func GetPost(username string) (error, []string) {
 	rows, err := dB.Query(sqlStr, username)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			err = sql.ErrNoRows
 			return err, output
 		} else {
 			return err, output
@@ -68,4 +67,13 @@ func GetAllPost() (error, []string, []string) {
 		}
 	}
 	return nil, user, output
+}
+
+func ChangePost(username, newPost string) error {
+	sqlStr := "update userPost set userPost = ? where username = ?"
+	_, err := dB.Exec(sqlStr, newPost, username)
+	if err != nil {
+		return err
+	}
+	return nil
 }
