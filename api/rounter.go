@@ -26,9 +26,9 @@ func InitEngine() {
 
 	comment := engine.Group("/comment")
 	{
-		comment.POST("/")   //发表评论
-		comment.GET("/:id") //获取评论
-		comment.DELETE("/") //删除评论
+		comment.POST("/", auth, postComment) //发表评论
+		comment.GET("/:id")                  //获取评论
+		comment.DELETE("/")                  //删除评论
 	}
 
 	engine.Run(":8090")

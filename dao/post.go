@@ -3,6 +3,7 @@ package dao
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
+	"message-board/model"
 )
 
 func Post(username, userPost string) error {
@@ -76,4 +77,14 @@ func ChangePost(username, newPost string) error {
 		return err
 	}
 	return nil
+}
+
+func SelectPost(postUsername, post string) (model.User, error) {
+	var u model.User
+	sqlStr := "select username,userPost from userPost where username=? and userPost=?"
+	err := dB.QueryRow(sqlStr, postUsername, post).Scan(&u.Username, &u.Post)
+	if err != nil {
+		return u, err
+	}
+	return u, nil
 }
