@@ -17,9 +17,9 @@ func InitEngine() {
 
 	PostGroup := engine.Group("/post")
 	{
-		PostGroup.POST("/", auth, Post)      //发留言
-		PostGroup.GET("/:id", auth, GetPost) //获取留言
-		PostGroup.DELETE("/")                //删除留言
+		PostGroup.POST("/", auth, Post)         //发留言
+		PostGroup.GET("/", auth, GetPost)       //获取留言
+		PostGroup.DELETE("/", auth, DeletePost) //删除留言
 	}
 
 	comment := engine.Group("/comment")
