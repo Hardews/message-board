@@ -18,7 +18,7 @@ func Post(c *gin.Context) {
 		tool.RespInternetError(c)
 		return
 	}
-	tool.RespSuccessfulWithDate(c, "留言成功！")
+	tool.RespSuccessfulWithUsernameAndDate(c, username, "留言成功！")
 }
 
 func GetPost(c *gin.Context) {
@@ -35,7 +35,7 @@ func GetPost(c *gin.Context) {
 		return
 	}
 	for i, _ := range user {
-		tool.RespSuccessfulWithDate(c, user[i])
+		tool.RespSuccessfulWithUsernameAndDate(c, username, user[i])
 	}
 
 }
@@ -53,13 +53,13 @@ func DeletePost(c *gin.Context) {
 }
 
 func getAllPost(c *gin.Context) {
-	err, output := dao.GetAllPost()
+	err, username, output := dao.GetAllPost()
 	if err != nil {
 		fmt.Println("getAllPost failed, err :", err)
 		tool.RespInternetError(c)
 		return
 	}
 	for i, _ := range output {
-		tool.RespSuccessfulWithDate(c, output[i])
+		tool.RespSuccessfulWithUsernameAndDate(c, username[i], output[i])
 	}
 }

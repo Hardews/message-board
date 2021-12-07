@@ -46,25 +46,26 @@ func DeletePost(username, userPost string) error {
 	return nil
 }
 
-func GetAllPost() (error, []string) {
-	sqlStr := "select userPost from userPost"
-	var output []string
-	var middle string
-	rows, err := dB.Query(sqlStr)
+func GetAllPost() (error, []string, []string) {
+	var output, user []string
+	var middle, username string
+	sqlStr1 := "select username,userPost from userPost"
+	rows, err := dB.Query(sqlStr1)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			err = sql.ErrNoRows
-			return err, output
+			return err, user, output
 		} else {
-			return err, output
+			return err, user, output
 		}
 	}
 	for rows.Next() {
-		err := rows.Scan(&middle)
-		if err != nil {
-			return rows.Err(), output
-		}
+		err := rows.Scan(&username, &middle)
+		user = append(user, username)
 		output = append(output, middle)
+		if err != nil {
+			return rows.Err(), user, output
+		}
 	}
-	return nil, output
+	return nil, user, output
 }
