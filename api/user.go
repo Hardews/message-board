@@ -38,19 +38,23 @@ func Register(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	err, res := service.CheckUsername(username)
-	switch {
-	case err == nil && res == false:
+	if res == false && err == nil {
 		tool.RespErrorWithDate(c, "用户名已存在")
-	case err != nil && res == false:
+		return
+	} else if err != nil && res == false {
 		fmt.Println("CheckUsername failed , err : ", err)
+		tool.RespInternetError(c)
 		return
 	}
+
 	if len(password) < 6 {
 		tool.RespErrorWithDate(c, "密码过短")
+		return
 	}
 	err = dao.WriteIn(username, password)
 	if err != nil {
 		fmt.Println("insert failed, err :", err)
+		tool.RespInternetError(c)
 		return
 	}
 	tool.RespSuccessful(c)

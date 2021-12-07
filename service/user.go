@@ -25,13 +25,13 @@ func CheckUsername(username string) (error, bool) {
 	if err != nil {
 		if err == sql.ErrNoRows {
 			err = nil
-			return err, true
 		} else {
 			return err, false
 		}
 	}
 	if user.Username == username {
-		return nil, false
+		return err, false
+	} else {
+		return nil, true
 	}
-	return nil, false
 }
