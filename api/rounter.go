@@ -9,7 +9,7 @@ func InitEngine() {
 		{
 			userGroup.POST("/register",Register)
 			userGroup.POST("/login",Login)
-			userGroup.POST("/password",replacePassword)
+			userGroup.POST("/password",auth,changePassword)
 
 			userGroup.GET("/info",getInfo)  //获取个人信息
 			userGroup.POST("/info",replaceInfo)  //更改个人信息

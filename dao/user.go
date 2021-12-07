@@ -33,3 +33,12 @@ func WriteIn(username,password string)  error{
 	 }
 	 return nil
 }
+
+func ChangePassword(username,password string)  error{
+	sqlStr := "update userInfo set password = ? where username = ?"
+	_,err := db.Exec(sqlStr,password,username)
+	if err != nil {
+		return err
+	}
+	return nil
+}
