@@ -3,14 +3,16 @@ package dao
 import (
 	"database/sql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 )
 
-var Db *sql.DB
+var dB *sql.DB
 
-func InitDB()  {
-	db,err := sql.Open("mysql","root:lmh123@tcp(127.0.0.1:3306)/userdata")
-	if err != nil{
+func InitDB() {
+	db, err := sql.Open("mysql", "root:lmh123@tcp(127.0.0.1:3306)/userdata")
+	if err != nil {
 		fmt.Println(err)
 	}
-	Db = db
+
+	dB = db
 }

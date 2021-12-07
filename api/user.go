@@ -27,7 +27,6 @@ func Login(c *gin.Context) {
 	if res {
 		c.SetCookie("user_login", username, 600, "/", "", false, true)
 		tool.RespSuccessful(c)
-		return
 	} else {
 		tool.RespErrorWithDate(c, "密码错误")
 		return
