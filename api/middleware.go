@@ -11,7 +11,7 @@ func auth(c *gin.Context)  {
 		 tool.RespErrorWithDate(c,"请登陆后再进行操作")
 		 c.Abort()
 	 }
-	 
+
 	 c.Set("username",username)
 	 c.Next()
 }

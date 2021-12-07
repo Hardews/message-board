@@ -7,7 +7,6 @@ import (
 	"message-board/dao"
 	"message-board/service"
 	"message-board/tool"
-	"net/http"
 )
 
 func Login(c *gin.Context) {
@@ -17,21 +16,18 @@ func Login(c *gin.Context) {
 	if err != nil{
 		switch  {
 		case res==false && err==sql.ErrNoRows:
-			c.JSON(http.StatusOK,gin.H{
-			"info":"无此账号",
-		})
+			tool.RespErrorWithDate(c,"无此账号")
 			return
 		default:fmt.Println(err)
 		        tool.RespInternetError(c)
+			return
 		}
-		return
 	}
 	if res{
 		tool.RespSuccessful(c)
 	}else {
-		c.JSON(http.StatusOK,gin.H{
-			"info":"密码错误！",
-		})
+		tool.RespErrorWithDate(c,"密码错误")
+		return
 	}
 
 
@@ -43,19 +39,13 @@ func Register(c *gin.Context) {
 	err,res := service.CheckUsername(username)
 	switch  {
 	case err == nil && res == false:
-		c.JSON(http.StatusOK,gin.H{
-		"info":"用户名已存在",
-	})
-		return
+		tool.RespErrorWithDate(c,"用户名已存在")
 	case err !=nil && res == false:
 		fmt.Println("CheckUsername failed , err : ",err)
 		return
 	}
 	if len(password)<6 {
-		c.JSON(http.StatusOK,gin.H{
-			"info":"密码过短",
-		})
-		return
+		tool.RespErrorWithDate(c,"密码过短")
 	}
 	err = dao.WriteIn(username,password)
 	if err!=nil{
