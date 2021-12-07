@@ -51,3 +51,15 @@ func DeletePost(c *gin.Context) {
 	}
 	tool.RespSuccessful(c)
 }
+
+func getAllPost(c *gin.Context) {
+	err, output := dao.GetAllPost()
+	if err != nil {
+		fmt.Println("getAllPost failed, err :", err)
+		tool.RespInternetError(c)
+		return
+	}
+	for i, _ := range output {
+		tool.RespSuccessfulWithDate(c, output[i])
+	}
+}
