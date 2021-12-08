@@ -15,26 +15,28 @@ func Post(username, userPost string) error {
 	return nil
 }
 
-func GetPost(username string) (error, []string) {
-	var output []string
-	var middle string
-	sqlStr := "select userPost from userPost where username = ?"
+func GetPost(username string) (error, []string, []string) {
+	var output, time []string
+	var user model.Post
+	var Time string
+	sqlStr := "select userPost,time from userPost where username = ?"
 	rows, err := dB.Query(sqlStr, username)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return err, output
+			return err, output, time
 		} else {
-			return err, output
+			return err, output, time
 		}
 	}
 	for rows.Next() {
-		err := rows.Scan(&middle)
+		err := rows.Scan(&user.Txt, &Time)
 		if err != nil {
-			return rows.Err(), output
+			return rows.Err(), output, time
 		}
-		output = append(output, middle)
+		output = append(output, user.Txt)
+		time = append(time, Time)
 	}
-	return nil, output
+	return nil, output, time
 }
 
 func DeletePost(username, userPost string) error {
@@ -46,28 +48,29 @@ func DeletePost(username, userPost string) error {
 	return nil
 }
 
-func GetAllPost() (error, []string, []string) {
-	var output, user []string
-	var middle, username string
-	sqlStr1 := "select username,userPost from userPost"
+func GetAllPost() (error, []string, []string, []string) {
+	var user model.Post
+	var username, txt, Time []string
+	var time string
+	sqlStr1 := "select username,userPost,time from userPost"
 	rows, err := dB.Query(sqlStr1)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			err = sql.ErrNoRows
-			return err, user, output
-		} else {
-			return err, user, output
+			err = nil
+			return err, username, txt, Time
 		}
+		return err, username, txt, Time
 	}
 	for rows.Next() {
-		err := rows.Scan(&username, &middle)
-		user = append(user, username)
-		output = append(output, middle)
+		err := rows.Scan(&user.Username, &user.Txt, &time)
 		if err != nil {
-			return rows.Err(), user, output
+			return err, username, txt, Time
 		}
+		username = append(username, user.Username)
+		txt = append(txt, user.Txt)
+		Time = append(Time, time)
 	}
-	return nil, user, output
+	return err, username, txt, Time
 }
 
 func ChangePost(username, newPost, oldUserPost string) error {
@@ -82,7 +85,7 @@ func ChangePost(username, newPost, oldUserPost string) error {
 func SelectPost(postUsername, post string) (model.User, error) {
 	var u model.User
 	sqlStr := "select username,userPost from userPost where username=? and userPost=?"
-	err := dB.QueryRow(sqlStr, postUsername, post).Scan(&u.Username, &u.Post)
+	err := dB.QueryRow(sqlStr, postUsername, post).Scan(&u.Username)
 	if err != nil {
 		return u, err
 	}
