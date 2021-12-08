@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"message-board/dao"
@@ -14,16 +13,11 @@ func Login(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	res, err := service.CheckPassword(username, password)
+	fmt.Println("login gin:", err)
 	if err != nil {
-		switch {
-		case res == false && err == sql.ErrNoRows:
-			tool.RespErrorWithDate(c, "无此账号")
-			return
-		default:
-			fmt.Println(err)
-			tool.RespInternetError(c)
-			return
-		}
+		fmt.Println(err)
+		tool.RespInternetError(c)
+		return
 	}
 	if res {
 		c.SetCookie("user_login", username, 600, "/", "", false, true)

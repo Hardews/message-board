@@ -7,16 +7,27 @@ import (
 
 func SelectByUsername(username string) (error, model.User) {
 	var user model.User
-	sqlStr := "select username,password from userInfo where username=?"
-	err := dB.QueryRow(sqlStr, username).Scan(&user.Username, &user.Password)
+	sqlStr := "SELECT username,password FROM userInfo WHERE username = ?;"
+	rows, err := dB.Query(sqlStr, username)
+
 	if err != nil {
 		return err, user
 	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&user.Username, &user.Password)
+		if err != nil {
+			return err, user
+		}
+	}
+
 	return nil, user
 }
 
 func WriteIn(username, password string) error {
-	sqlStr := "insert into userInfo (username,password) values (?,?)"
+	sqlStr := "insert into userInfo (username,password) values (?,?);"
 	_, err := dB.Exec(sqlStr, username, password)
 	if err != nil {
 		return err
@@ -25,7 +36,7 @@ func WriteIn(username, password string) error {
 }
 
 func ChangePassword(username, password string) error {
-	sqlStr := "update userInfo set password = ? where username = ?"
+	sqlStr := "update userInfo set password = ? where username = ?;"
 	_, err := dB.Exec(sqlStr, password, username)
 	if err != nil {
 		return err
