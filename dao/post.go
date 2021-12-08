@@ -70,9 +70,9 @@ func GetAllPost() (error, []string, []string) {
 	return nil, user, output
 }
 
-func ChangePost(username, newPost string) error {
-	sqlStr := "update userPost set userPost = ? where username = ?"
-	_, err := dB.Exec(sqlStr, newPost, username)
+func ChangePost(username, newPost, oldUserPost string) error {
+	sqlStr := "update userPost set userPost = ? where username = ? and userPost = ?"
+	_, err := dB.Exec(sqlStr, newPost, username, oldUserPost)
 	if err != nil {
 		return err
 	}

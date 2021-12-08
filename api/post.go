@@ -43,9 +43,15 @@ func DeletePost(c *gin.Context) {
 	iUsername, _ := c.Get("username")
 	username := iUsername.(string)
 	postWantDelete := c.PostForm("post")
-	err := dao.DeletePost(username, postWantDelete)
+	_, err := dao.SelectPost(username, postWantDelete)
+	if err != nil {
+		tool.RespErrorWithDate(c, "删除失败，未查询到该留言")
+		return
+	}
+	err = dao.DeletePost(username, postWantDelete)
 	if err != nil {
 		fmt.Println("delete post failed , err :", err)
+		tool.RespInternetError(c)
 		return
 	}
 	tool.RespSuccessful(c)
@@ -66,7 +72,8 @@ func changePost(c *gin.Context) {
 	}
 
 	newPost := c.PostForm("newPost")
-	err = dao.ChangePost(username, newPost)
+	oldPost := c.PostForm("oldPost")
+	err = dao.ChangePost(username, newPost, oldPost)
 	if err != nil {
 		fmt.Println("changePost failed, err :", err)
 		tool.RespInternetError(c)
