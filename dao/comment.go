@@ -1,17 +1,17 @@
 package dao
 
-func PostComment(username, userPost, comment string) error {
-	sqlStr := "insert into userComment (username,userPosr,comment) values (?,?,?)"
-	_, err := dB.Exec(sqlStr, username, userPost, comment)
+func PostComment(username, comment string, postId int) error {
+	sqlStr := "insert into userComment (postid,username,comment) values (?,?,?)"
+	_, err := dB.Exec(sqlStr, postId, username, comment)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func DeleteComment(username, comment string) error {
-	sqlStr := "delete comment from userComment where username = ? and comment = ?"
-	_, err := dB.Exec(sqlStr, username, comment)
+func DeleteComment(id int) error {
+	sqlStr := "delete comment from userComment where id = ?"
+	_, err := dB.Exec(sqlStr, id)
 	if err != nil {
 		return err
 	}
@@ -47,4 +47,14 @@ func ChangeComment(oldComment, newComment string) error {
 		return err
 	}
 	return nil
+}
+
+func SelectByCommentId(username, comment string, postID int) (error, int) {
+	var id int
+	sqlStr := "select id from userComment where username = ? and comment = ? and postID = ?"
+	err := dB.QueryRow(sqlStr, username, comment, postID).Scan(&id)
+	if err != nil {
+		return err, id
+	}
+	return nil, id
 }

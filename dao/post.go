@@ -91,3 +91,13 @@ func SelectPost(postUsername, post string) (model.User, error) {
 	}
 	return u, nil
 }
+
+func SelectByPostId(postName, userPost string) (int, error) {
+	var u model.Post
+	sqlStr := "select id from userPost where username=? and userPost=?"
+	err := dB.QueryRow(sqlStr, postName, userPost).Scan(&u.PostID)
+	if err != nil {
+		return u.PostID, err
+	}
+	return u.PostID, err
+}
