@@ -36,3 +36,12 @@ func RespSuccessfulWithUsernameAndDate(c *gin.Context, username string, date, ti
 		"post":     date,
 	})
 }
+
+func RespPostAndComment(c *gin.Context, postName, postTxt, commentName, comment string) {
+	c.JSON(http.StatusOK, gin.H{
+		"postName":    postName,
+		"postTxt":     postTxt,
+		"commentName": commentName,
+		"comment":     comment,
+	})
+}

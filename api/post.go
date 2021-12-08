@@ -25,20 +25,28 @@ func Post(c *gin.Context) {
 	tool.RespSuccessfulWithUsernameAndDate(c, user.Username, "留言成功！", time.Now())
 }
 
-func GetPost(c *gin.Context) {
+func GetOnesPost(c *gin.Context) {
 	user.Username = c.PostForm("wantGetPostUsername")
-	err, users, time := dao.GetPost(user.Username)
+	user.Txt = c.PostForm("postTxt")
+	PostID, err := dao.SelectByPostId(user.Username, user.Txt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			tool.RespErrorWithDate(c, "此账号无留言")
 			return
 		}
-		fmt.Println("get output failed, err :", err)
+		fmt.Println("get PostID failed, err :", err)
 		tool.RespInternetError(c)
 		return
 	}
-	for i, _ := range users {
-		tool.RespSuccessfulWithUsernameAndDate(c, user.Username, users[i], time[i])
+
+	err, posts, comments := dao.SelectPostAndCommentByPostID(PostID)
+	if err != nil {
+		fmt.Println("get PostID failed, err :", err)
+		tool.RespInternetError(c)
+		return
+	}
+	for i, _ := range posts {
+		tool.RespPostAndComment(c, posts[i].Username, posts[i].Txt, comments[i].Username, comments[i].Txt)
 	}
 }
 
@@ -63,7 +71,7 @@ func DeletePost(c *gin.Context) {
 func changePost(c *gin.Context) {
 	iUsername, _ := c.Get("username")
 	user.Username = iUsername.(string)
-	err, _, _ := dao.GetPost(user.Username)
+	err := dao.GetPost(user.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			tool.RespErrorWithDate(c, "无留言")
