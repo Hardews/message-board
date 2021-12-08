@@ -66,7 +66,7 @@ func updateComment(c *gin.Context) {
 		return
 	}
 
-	err = dao.ChangeComment(username, newComment, oldComment)
+	err = dao.ChangeComment(oldComment, newComment)
 	if err != nil {
 		fmt.Println("changeComment failed, err :", err)
 		tool.RespInternetError(c)

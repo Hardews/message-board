@@ -13,7 +13,6 @@ func Login(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	res, err := service.CheckPassword(username, password)
-	fmt.Println("login gin:", err)
 	if err != nil {
 		fmt.Println(err)
 		tool.RespInternetError(c)

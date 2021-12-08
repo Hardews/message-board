@@ -20,11 +20,14 @@ func DeleteComment(username, comment string) error {
 
 func SelectComment(username, comment string) (error, bool) {
 	var checkName, CheckComment string
-	sqlStr := "select username,comment from userComment where username = ? and comment = ?"
-	rows, err := dB.Query(sqlStr, username, comment)
+	sqlStr := "select username,comment from userComment where username = ?"
+	rows, err := dB.Query(sqlStr, username)
 	if err != nil {
 		return err, false
 	}
+
+	defer rows.Close()
+
 	for rows.Next() {
 		err := rows.Scan(&checkName, &CheckComment)
 		if checkName == username && CheckComment == comment {
@@ -34,12 +37,12 @@ func SelectComment(username, comment string) (error, bool) {
 			return err, false
 		}
 	}
-	return err, true
+	return err, false
 }
 
-func ChangeComment(username, oldComment, newComment string) error {
-	sqlStr := "update userComment set comment = ? where username = ? and comment = ?"
-	_, err := dB.Exec(sqlStr, newComment, username, oldComment)
+func ChangeComment(oldComment, newComment string) error {
+	sqlStr := "update userComment set comment = ? where comment = ? "
+	_, err := dB.Exec(sqlStr, newComment, oldComment)
 	if err != nil {
 		return err
 	}
