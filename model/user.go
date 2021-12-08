@@ -5,3 +5,11 @@ type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
+
+type UserInfo struct {
+	Id           int
+	Name         string
+	Professional string
+	School       string
+	Specialty    string
+}

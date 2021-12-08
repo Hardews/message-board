@@ -5,31 +5,37 @@ import "github.com/gin-gonic/gin"
 func InitEngine() {
 	engine := gin.Default()
 
+	engine.POST("/register", Register)
+	engine.POST("/login", Login)
+
 	userGroup := engine.Group("/user")
 	{
-		userGroup.POST("/register", Register)
-		userGroup.POST("/login", Login)
-		userGroup.POST("/password", auth, changePassword)
+		userGroup.Use(auth)
 
-		userGroup.GET("/info", getInfo)      //获取个人信息
-		userGroup.POST("/info", replaceInfo) //更改个人信息
+		userGroup.POST("/password", changePassword)
+		userGroup.POST("/writeInfo", writeInfo) //填写个人信息
+		userGroup.GET("/info", getInfo)         //获取个人信息
+		userGroup.POST("/info", changeInfo)     //更改个人信息
 	}
 
 	PostGroup := engine.Group("/post")
 	{
-		PostGroup.POST("/", auth, Post)         //发留言
-		PostGroup.GET("/", auth, GetOnesPost)   //获取某个人的留言及其下属评论
-		PostGroup.DELETE("/", auth, DeletePost) //删除留言
+		PostGroup.Use(auth)
+
+		PostGroup.POST("/", Post)         //发留言
+		PostGroup.GET("/", GetOnesPost)   //获取某个人的留言及其下属评论
+		PostGroup.DELETE("/", DeletePost) //删除留言
 		PostGroup.GET("/all", getAllPost)
-		PostGroup.POST("change", auth, changePost)
+		PostGroup.POST("change", changePost)
 	}
 
 	comment := engine.Group("/comment")
 	{
-		comment.POST("/", auth, addComment)      //发表评论
-		comment.GET("/:username")                //获取评论
-		comment.DELETE("/", auth, deleteComment) //删除评论
-		comment.POST("/update", auth, changeComment)
+		comment.Use(auth)
+
+		comment.POST("/", addComment)      //发表评论
+		comment.DELETE("/", deleteComment) //删除评论
+		comment.POST("/update", changeComment)
 	}
 
 	engine.Run(":8090")

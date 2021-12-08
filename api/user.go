@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"message-board/dao"
+	"message-board/model"
 	"message-board/service"
 	"message-board/tool"
 	"net/http"
@@ -86,10 +87,58 @@ func changePassword(c *gin.Context) {
 	tool.RespSuccessful(c)
 }
 
-func getInfo(c *gin.Context) {
+func writeInfo(c *gin.Context) {
+	iUsername, _ := c.Get("username")
+	username := iUsername.(string)
 
+	var userInfo model.UserInfo
+	userInfo.Name = c.PostForm("Name")
+	userInfo.Professional = c.PostForm("Professional")
+	userInfo.Specialty = c.PostForm("Specialty")
+	userInfo.School = c.PostForm("University")
+
+	err := dao.WriteUserInfoIN(userInfo, username)
+	if err != nil {
+		fmt.Println("write userinfo failed , err :", err)
+		tool.RespInternetError(c)
+		return
+	}
+	tool.RespSuccessful(c)
 }
 
-func replaceInfo(c *gin.Context) {
+func getInfo(c *gin.Context) {
+	iUsername, _ := c.Get("username")
+	username := iUsername.(string)
 
+	userInfo, err := dao.GetUserInfo(username)
+	if err != nil {
+		fmt.Println("get userinfo failed , err :", err)
+		tool.RespInternetError(c)
+		return
+	}
+	tool.RespErrorWithDate(c, userInfo)
+}
+
+func changeInfo(c *gin.Context) {
+	iUsername, _ := c.Get("username")
+	username := iUsername.(string)
+
+	newUserInfo, err := dao.GetUserInfo(username)
+	if err != nil {
+		fmt.Println("get userinfo failed , err :", err)
+		tool.RespInternetError(c)
+		return
+	}
+	newUserInfo.Name = c.PostForm("newName")
+	newUserInfo.Professional = c.PostForm("newProfessional")
+	newUserInfo.Specialty = c.PostForm("newSpecialty")
+	newUserInfo.School = c.PostForm("newUniversity")
+
+	err = dao.ChangeUserInfo(newUserInfo, username)
+	if err != nil {
+		fmt.Println("change userinfo failed , err :", err)
+		tool.RespInternetError(c)
+		return
+	}
+	tool.RespSuccessful(c)
 }
