@@ -1,7 +1,7 @@
 package dao
 
 func PostComment(username, comment string, postId int) error {
-	sqlStr := "insert into userComment (postid,username,comment) values (?,?,?)"
+	sqlStr := "insert into userComment (postid,commentName,comment) values (?,?,?)"
 	_, err := dB.Exec(sqlStr, postId, username, comment)
 	if err != nil {
 		return err
@@ -20,7 +20,7 @@ func DeleteComment(id int) error {
 
 func SelectComment(username, comment string) (error, bool) {
 	var checkName, CheckComment string
-	sqlStr := "select username,comment from userComment where username = ?"
+	sqlStr := "select commentName,comment from userComment where commentName= ?"
 	rows, err := dB.Query(sqlStr, username)
 	if err != nil {
 		return err, false
@@ -51,7 +51,7 @@ func ChangeComment(oldComment, newComment string) error {
 
 func SelectByCommentId(username, comment string, postID int) (error, int) {
 	var id int
-	sqlStr := "select id from userComment where username = ? and comment = ? and postID = ?"
+	sqlStr := "select id from userComment where commentName = ? and comment = ? and postID = ?"
 	err := dB.QueryRow(sqlStr, username, comment, postID).Scan(&id)
 	if err != nil {
 		return err, id

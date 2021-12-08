@@ -61,10 +61,10 @@ func ChangePost(username, newPost, oldUserPost string) error {
 	return nil
 }
 
-func SelectPost(postUsername, post string) (model.User, error) {
-	var u model.User
-	sqlStr := "select username,userPost from userPost where username=? and userPost=?"
-	err := dB.QueryRow(sqlStr, postUsername, post).Scan(&u.Username)
+func SelectPost(postUsername, post string) (model.Post, error) {
+	var u model.Post
+	sqlStr := "select username,userPost from userPost where username = ? and userPost = ?"
+	err := dB.QueryRow(sqlStr, postUsername, post).Scan(&u.Username, &u.Txt)
 	if err != nil {
 		return u, err
 	}
