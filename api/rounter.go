@@ -13,9 +13,11 @@ func InitEngine() {
 		userGroup.Use(auth)
 
 		userGroup.POST("/password", changePassword)
-		userGroup.POST("/writeInfo", writeInfo) //填写个人信息
-		userGroup.GET("/info", getInfo)         //获取个人信息
-		userGroup.POST("/info", changeInfo)     //更改个人信息
+		userGroup.POST("/writeInfo", writeInfo)     //填写个人信息
+		userGroup.GET("/info", getInfo)             //获取个人信息
+		userGroup.POST("/info", changeInfo)         //更改个人信息
+		userGroup.POST("/likeComment", LikeComment) //给某个人的评论点赞
+		userGroup.POST("/likePost", LikePost)
 	}
 
 	PostGroup := engine.Group("/post")

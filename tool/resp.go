@@ -23,6 +23,12 @@ func RespInternetError(c *gin.Context) {
 	})
 }
 
+func RespSuccessfulWithDate(c *gin.Context, Date interface{}) {
+	c.JSON(http.StatusInternalServerError, gin.H{
+		"info": Date,
+	})
+}
+
 func RespSuccessful(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"info": "成功！",
