@@ -74,3 +74,11 @@ func ChangeInfo(newInfo model.UserInfo, username string) (bool, error) {
 	}
 	return true, err
 }
+
+func ChangePassword(username, newPassword string) error {
+	err := dao.ChangePassword(username, newPassword)
+	if err != nil {
+		return err
+	}
+	return err
+}

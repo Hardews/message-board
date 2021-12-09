@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"message-board/dao"
 	"message-board/model"
 	"message-board/service"
 	"message-board/tool"
@@ -81,7 +80,7 @@ func changePassword(c *gin.Context) {
 		return
 	}
 
-	err = dao.ChangePassword(username, newPassword)
+	err = service.ChangePassword(username, newPassword)
 	if err != nil {
 		fmt.Println("replace password failed, err:", err)
 		tool.RespInternetError(c)
