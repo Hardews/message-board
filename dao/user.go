@@ -8,19 +8,10 @@ import (
 func SelectByUsername(username string) (error, model.User) {
 	var user model.User
 	sqlStr := "SELECT username,password FROM userInfo WHERE username = ?;"
-	rows, err := dB.Query(sqlStr, username)
+	err := dB.QueryRow(sqlStr, username).Scan(&user.Username, &user.Password)
 
 	if err != nil {
 		return err, user
-	}
-
-	defer rows.Close()
-
-	for rows.Next() {
-		err = rows.Scan(&user.Username, &user.Password)
-		if err != nil {
-			return err, user
-		}
 	}
 
 	return nil, user

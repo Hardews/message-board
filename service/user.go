@@ -9,12 +9,11 @@ import (
 func CheckPassword(username, password string) (bool, error) {
 	err, user := dao.SelectByUsername(username)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return false, err
-		}
-	}
-	if user.Password != password {
 		return false, err
+	}
+	_, flag := Interpretation(user.Password, password)
+	if !flag {
+		return false, nil
 	}
 	return true, nil
 }
@@ -24,10 +23,9 @@ func CheckUsername(username string) (error, bool) {
 	if err != nil {
 		if err == sql.ErrNoRows {
 			err = nil
-			return err, false
-		} else {
-			return err, false
+			return err, true
 		}
+		return err, false
 	}
 	if user.Username == username {
 		return err, false

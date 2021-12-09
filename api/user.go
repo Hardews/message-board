@@ -47,6 +47,12 @@ func Register(c *gin.Context) {
 		return
 	}
 
+	err, password = service.Encryption(password)
+	if err != nil {
+		fmt.Println("register failed , err :", err)
+		tool.RespInternetError(c)
+		return
+	}
 	err = service.WriteIn(username, password)
 	if err != nil {
 		fmt.Println("register failed , err :", err)
@@ -65,7 +71,7 @@ func changePassword(c *gin.Context) {
 
 	res, err := service.CheckPassword(username, oldPassword)
 	if err != nil {
-		fmt.Println("checkPassword failed, err :", err)
+		fmt.Println(err)
 		tool.RespInternetError(c)
 		return
 	}
@@ -80,12 +86,20 @@ func changePassword(c *gin.Context) {
 		return
 	}
 
-	err = service.ChangePassword(username, newPassword)
+	err, newPassword = service.Encryption(newPassword)
 	if err != nil {
-		fmt.Println("replace password failed, err:", err)
+		fmt.Println("change password failed, err:", err)
 		tool.RespInternetError(c)
 		return
 	}
+
+	err = service.ChangePassword(username, newPassword)
+	if err != nil {
+		fmt.Println("change password failed, err:", err)
+		tool.RespInternetError(c)
+		return
+	}
+
 	tool.RespSuccessful(c)
 }
 
