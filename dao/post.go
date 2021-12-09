@@ -15,9 +15,10 @@ func Post(username, userPost string) error {
 	return nil
 }
 
-func DeletePost(PostID int) error {
-	sqlStr := "delete userPost from userPost where id=?"
-	_, err := dB.Exec(sqlStr, PostID)
+func DeletePost(PostID int, userPost string) error {
+	sqlStr := "update userPost set userPost = ? where id=?"
+	userPost = userPost + "(已被删除)"
+	_, err := dB.Exec(sqlStr, userPost, PostID)
 	if err != nil {
 		return err
 	}

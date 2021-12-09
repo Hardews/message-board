@@ -59,11 +59,11 @@ func DeletePost(c *gin.Context) {
 	postWantDelete := c.PostForm("post")
 	PostID, err := service.SelectByPostID(postUser.Username, postWantDelete)
 	if err != nil {
-		tool.RespErrorWithDate(c, "删除失败，未查询到该留言")
+		tool.RespErrorWithDate(c, "未查询到该留言")
 		return
 	}
 
-	err = service.DeletePost(PostID)
+	err = service.DeletePost(PostID, postWantDelete)
 	if err != nil {
 		fmt.Println("delete post failed , err :", err)
 		tool.RespInternetError(c)

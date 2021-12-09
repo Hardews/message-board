@@ -29,8 +29,8 @@ func GetPost(PostID int) (error, []model.Post, []model.Comment) {
 	return err, posts, comments
 }
 
-func DeletePost(postId int) error {
-	err := dao.DeletePost(postId)
+func DeletePost(postId int, post string) error {
+	err := dao.DeletePost(postId, post)
 	if err != nil {
 		return err
 	}
