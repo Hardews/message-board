@@ -7,7 +7,6 @@ import (
 	"message-board/model"
 	"message-board/service"
 	"message-board/tool"
-	"net/http"
 )
 
 func Login(c *gin.Context) {
@@ -32,6 +31,7 @@ func Login(c *gin.Context) {
 func Register(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
+
 	err, res := service.CheckUsername(username)
 	if res == false && err == nil {
 		tool.RespErrorWithDate(c, "用户名已存在")
@@ -42,13 +42,15 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	if len(password) < 6 {
-		tool.RespErrorWithDate(c, "密码过短")
+	flag := service.CheckLength(password)
+	if !flag {
+		tool.RespErrorWithDate(c, "密码长度不足")
 		return
 	}
-	err = dao.WriteIn(username, password)
+
+	err = service.WriteIn(username, password)
 	if err != nil {
-		fmt.Println("insert failed, err :", err)
+		fmt.Println("register failed , err :", err)
 		tool.RespInternetError(c)
 		return
 	}
@@ -72,12 +74,13 @@ func changePassword(c *gin.Context) {
 		tool.RespErrorWithDate(c, "旧密码错误")
 		return
 	}
-	if len(newPassword) < 6 {
-		c.JSON(http.StatusOK, gin.H{
-			"info": "密码过短",
-		})
+
+	flag := service.CheckLength(newPassword)
+	if !flag {
+		tool.RespErrorWithDate(c, "密码长度不足!")
 		return
 	}
+
 	err = dao.ChangePassword(username, newPassword)
 	if err != nil {
 		fmt.Println("replace password failed, err:", err)
@@ -97,12 +100,13 @@ func writeInfo(c *gin.Context) {
 	userInfo.Specialty = c.PostForm("Specialty")
 	userInfo.School = c.PostForm("University")
 
-	err := dao.WriteUserInfoIN(userInfo, username)
+	err := service.WriteInfo(userInfo, username)
 	if err != nil {
-		fmt.Println("write userinfo failed , err :", err)
+		fmt.Println("write info failed , err : ", err)
 		tool.RespInternetError(c)
 		return
 	}
+
 	tool.RespSuccessful(c)
 }
 
@@ -110,12 +114,13 @@ func getInfo(c *gin.Context) {
 	iUsername, _ := c.Get("username")
 	username := iUsername.(string)
 
-	userInfo, err := dao.GetUserInfo(username)
+	userInfo, err := service.GetInfo(username)
 	if err != nil {
-		fmt.Println("get userinfo failed , err :", err)
+		fmt.Println("get info failed, err :", err)
 		tool.RespInternetError(c)
 		return
 	}
+
 	tool.RespErrorWithDate(c, userInfo)
 }
 
@@ -123,21 +128,27 @@ func changeInfo(c *gin.Context) {
 	iUsername, _ := c.Get("username")
 	username := iUsername.(string)
 
-	newUserInfo, err := dao.GetUserInfo(username)
+	newUserInfo, err := service.GetInfo(username)
 	if err != nil {
 		fmt.Println("get userinfo failed , err :", err)
 		tool.RespInternetError(c)
 		return
 	}
+
 	newUserInfo.Name = c.PostForm("newName")
 	newUserInfo.Professional = c.PostForm("newProfessional")
 	newUserInfo.Specialty = c.PostForm("newSpecialty")
 	newUserInfo.School = c.PostForm("newUniversity")
 
-	err = dao.ChangeUserInfo(newUserInfo, username)
+	flag, err := service.ChangeInfo(newUserInfo, username)
 	if err != nil {
 		fmt.Println("change userinfo failed , err :", err)
 		tool.RespInternetError(c)
+		return
+	}
+
+	if !flag {
+		tool.RespErrorWithDate(c, "修改失败，查询不到该用户信息")
 		return
 	}
 	tool.RespSuccessful(c)

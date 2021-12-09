@@ -1,17 +1,19 @@
 package dao
 
-func PostComment(username, comment string, postId int) error {
+import "message-board/model"
+
+func AddComment(commentUser model.Comment) error {
 	sqlStr := "insert into userComment (postid,commentName,comment) values (?,?,?)"
-	_, err := dB.Exec(sqlStr, postId, username, comment)
+	_, err := dB.Exec(sqlStr, commentUser.PostID, commentUser.Username, commentUser.Txt)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func DeleteComment(id int) error {
-	sqlStr := "delete comment from userComment where id = ?"
-	_, err := dB.Exec(sqlStr, id)
+func DeleteComment(id, PostId int) error {
+	sqlStr := "delete comment from userComment where id = ? and PostID = ?"
+	_, err := dB.Exec(sqlStr, id, PostId)
 	if err != nil {
 		return err
 	}
@@ -40,19 +42,19 @@ func SelectComment(username, comment string) (error, bool) {
 	return err, false
 }
 
-func ChangeComment(oldComment, newComment string) error {
-	sqlStr := "update userComment set comment = ? where comment = ? "
-	_, err := dB.Exec(sqlStr, newComment, oldComment)
+func ChangeComment(newComment string, commentID int) error {
+	sqlStr := "update userComment set comment = ? where commentID = ? "
+	_, err := dB.Exec(sqlStr, newComment, commentID)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func SelectByCommentId(username, comment string, postID int) (error, int) {
+func SelectByCommentId(cUser model.Comment) (error, int) {
 	var id int
 	sqlStr := "select id from userComment where commentName = ? and comment = ? and postID = ?"
-	err := dB.QueryRow(sqlStr, username, comment, postID).Scan(&id)
+	err := dB.QueryRow(sqlStr, cUser.Username, cUser.Txt, cUser.Username).Scan(&id)
 	if err != nil {
 		return err, id
 	}

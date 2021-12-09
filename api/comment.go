@@ -4,23 +4,24 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"message-board/dao"
 	"message-board/model"
+	"message-board/service"
 	"message-board/tool"
 	"time"
 )
 
-var users model.Comment
+var commentUser model.Comment
 
 func addComment(c *gin.Context) {
 	var err error
 	iUsername, _ := c.Get("username")
-	users.Username = iUsername.(string)
+	commentUser.Username = iUsername.(string)
 
 	postName := c.PostForm("postName")
 	postTxt := c.PostForm("postTxt")
+	commentUser.Txt = c.PostForm("comment")
 
-	users.PostID, err = dao.SelectByPostId(postName, postTxt)
+	commentUser.PostID, err = service.SelectByPostID(postName, postTxt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			tool.RespErrorWithDate(c, "无此用户或留言")
@@ -30,9 +31,7 @@ func addComment(c *gin.Context) {
 		tool.RespInternetError(c)
 	}
 
-	users.Txt = c.PostForm("comment")
-
-	err = dao.PostComment(users.Username, users.Txt, users.PostID)
+	err = service.AddComment(commentUser)
 	if err != nil {
 		fmt.Println("insert comment failed,err:", err)
 		tool.RespInternetError(c)
@@ -44,13 +43,13 @@ func addComment(c *gin.Context) {
 func deleteComment(c *gin.Context) {
 	var err error
 	iUsername, _ := c.Get("username")
-	users.Username = iUsername.(string)
+	commentUser.Username = iUsername.(string)
 
-	commentWantDelete := c.PostForm("comment")
+	commentUser.Txt = c.PostForm("commentWantDelete")
 	postName := c.PostForm("postName")
 	postTxt := c.PostForm("postTxt")
 
-	users.PostID, err = dao.SelectByPostId(postName, postTxt)
+	commentUser.PostID, err = service.SelectByPostID(postName, postTxt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			tool.RespErrorWithDate(c, "无此用户或留言")
@@ -60,7 +59,7 @@ func deleteComment(c *gin.Context) {
 		tool.RespInternetError(c)
 	}
 
-	err, users.CommentId = dao.SelectByCommentId(user.Username, commentWantDelete, user.PostID)
+	commentUser.CommentId, err = service.SelectCommentID(commentUser)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			tool.RespErrorWithDate(c, "没有这个评论")
@@ -70,7 +69,8 @@ func deleteComment(c *gin.Context) {
 		tool.RespInternetError(c)
 		return
 	}
-	err = dao.DeleteComment(users.CommentId)
+
+	err = service.DeleteComment(commentUser.CommentId, commentUser.PostID)
 	if err != nil {
 		fmt.Println("select commentId failed, err:", err)
 		tool.RespInternetError(c)
@@ -80,28 +80,43 @@ func deleteComment(c *gin.Context) {
 }
 
 func changeComment(c *gin.Context) {
+	var err error
 	iUsername, _ := c.Get("username")
-	users.Username = iUsername.(string)
+	commentUser.Username = iUsername.(string)
 
-	oldComment := c.PostForm("oldComment")
+	commentUser.Txt = c.PostForm("oldComment")
 	newComment := c.PostForm("newComment")
 
-	err, flag := dao.SelectComment(users.Username, oldComment)
+	postName := c.PostForm("postName")
+	postTxt := c.PostForm("postTxt")
+
+	commentUser.PostID, err = service.SelectByPostID(postName, postTxt)
 	if err != nil {
-		fmt.Println("select comment failed , err :", err)
+		if err == sql.ErrNoRows {
+			tool.RespErrorWithDate(c, "无此用户或留言")
+			return
+		}
+		fmt.Println("select postID failed , err :", err)
+		tool.RespInternetError(c)
+	}
+
+	commentUser.CommentId, err = service.SelectCommentID(commentUser)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			tool.RespErrorWithDate(c, "没有这个评论")
+			return
+		}
+		fmt.Println("select commentId failed, err:", err)
 		tool.RespInternetError(c)
 		return
 	}
-	if !flag {
-		tool.RespErrorWithDate(c, "无此评论")
-		return
-	}
 
-	err = dao.ChangeComment(oldComment, newComment)
+	err = service.ChangeComment(newComment, commentUser.CommentId)
 	if err != nil {
 		fmt.Println("changeComment failed, err :", err)
 		tool.RespInternetError(c)
 		return
 	}
-	tool.RespSuccessfulWithUsernameAndDate(c, users.Username, "修改评论成功", time.Now())
+
+	tool.RespSuccessfulWithUsernameAndDate(c, commentUser.Username, "修改评论成功", time.Now())
 }
