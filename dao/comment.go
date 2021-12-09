@@ -43,7 +43,7 @@ func SelectComment(username, comment string) (error, bool) {
 }
 
 func ChangeComment(newComment string, commentID int) error {
-	sqlStr := "update userComment set comment = ? where commentID = ? "
+	sqlStr := "update userComment set comment = ? where id = ? "
 	_, err := dB.Exec(sqlStr, newComment, commentID)
 	if err != nil {
 		return err
@@ -54,7 +54,7 @@ func ChangeComment(newComment string, commentID int) error {
 func SelectByCommentId(cUser model.Comment) (error, int) {
 	var id int
 	sqlStr := "select id from userComment where commentName = ? and comment = ? and postID = ?"
-	err := dB.QueryRow(sqlStr, cUser.Username, cUser.Txt, cUser.Username).Scan(&id)
+	err := dB.QueryRow(sqlStr, cUser.Username, cUser.Txt, cUser.PostID).Scan(&id)
 	if err != nil {
 		return err, id
 	}

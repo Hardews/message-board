@@ -15,6 +15,7 @@ func LikeComment(c *gin.Context) {
 
 	postName := c.PostForm("postName")
 	postTxt := c.PostForm("postTxt")
+	commentUser.Username = c.PostForm("commentName")
 	commentUser.Txt = c.PostForm("comment")
 
 	commentUser.PostID, err = service.SelectByPostID(postName, postTxt)

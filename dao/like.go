@@ -3,8 +3,8 @@ package dao
 import "message-board/model"
 
 func SelectCommentLikeNum(id int, user model.Like) (int, error) {
-	sqlStr := "select likeNum from commentLike where id = ?"
-	err := dB.QueryRow(sqlStr, id).Scan(user.CommentLikeNum)
+	sqlStr := "select likeNum from userComment where id = ?"
+	err := dB.QueryRow(sqlStr, id).Scan(&user.CommentLikeNum)
 	if err != nil {
 		return 0, err
 	}
@@ -13,9 +13,9 @@ func SelectCommentLikeNum(id int, user model.Like) (int, error) {
 }
 
 func LikeComment(LikeNum int, info model.Comment, username string) error {
-	sqlStr1 := "insert into userComment (likeNum) values (?);"
+	sqlStr1 := "update userComment set likeNum = ? where id = ?"
 	LikeNum += 1
-	_, err := dB.Exec(sqlStr1, LikeNum)
+	_, err := dB.Exec(sqlStr1, LikeNum, info.CommentId)
 	if err != nil {
 		return err
 	}
@@ -29,8 +29,8 @@ func LikeComment(LikeNum int, info model.Comment, username string) error {
 }
 
 func SelectPostLikeNum(id int, user model.Like) (int, error) {
-	sqlStr := "select likeNum from postLike where id = ?"
-	err := dB.QueryRow(sqlStr, id).Scan(user.PostLikeNum)
+	sqlStr := "select likeNum from userPost where id = ?"
+	err := dB.QueryRow(sqlStr, id).Scan(&user.PostLikeNum)
 	if err != nil {
 		return 0, err
 	}
@@ -39,9 +39,9 @@ func SelectPostLikeNum(id int, user model.Like) (int, error) {
 }
 
 func LikePost(LikeNum int, info model.Post, username string) error {
-	sqlStr1 := "insert into userPost (likeNum) values (?);"
+	sqlStr1 := "update userPost set likeNum = ? where id = ?"
 	LikeNum += 1
-	_, err := dB.Exec(sqlStr1, LikeNum)
+	_, err := dB.Exec(sqlStr1, LikeNum, info.PostID)
 	if err != nil {
 		return err
 	}
