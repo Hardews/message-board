@@ -42,13 +42,6 @@ func WriteIn(username, password string) error {
 	return nil
 }
 
-func CheckLength(password string) bool {
-	if len(password) < 6 {
-		return false
-	}
-	return true
-}
-
 func WriteInfo(userInfo model.UserInfo, username string) error {
 	err := dao.WriteUserInfoIN(userInfo, username)
 	if err != nil {

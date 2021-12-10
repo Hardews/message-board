@@ -31,6 +31,17 @@ func addComment(c *gin.Context) {
 		tool.RespInternetError(c)
 	}
 
+	flag := service.CheckTxtLength(commentUser.Txt)
+	if !flag {
+		tool.RespErrorWithDate(c, "评论过长(大于20字)")
+		return
+	}
+	flag = service.CheckSensitiveWords(commentUser.Txt)
+	if !flag {
+		tool.RespErrorWithDate(c, "评论包含敏感词")
+		return
+	}
+
 	err = service.AddComment(commentUser)
 	if err != nil {
 		fmt.Println("insert comment failed,err:", err)
@@ -98,6 +109,17 @@ func changeComment(c *gin.Context) {
 		}
 		fmt.Println("select postID failed , err :", err)
 		tool.RespInternetError(c)
+	}
+
+	flag := service.CheckTxtLength(newComment)
+	if !flag {
+		tool.RespErrorWithDate(c, "评论过长(大于20字)")
+		return
+	}
+	flag = service.CheckSensitiveWords(newComment)
+	if !flag {
+		tool.RespErrorWithDate(c, "评论包含敏感词")
+		return
 	}
 
 	commentUser.CommentId, err = service.SelectCommentID(commentUser)
