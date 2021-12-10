@@ -31,17 +31,6 @@ func addComment(c *gin.Context) {
 		tool.RespInternetError(c)
 	}
 
-	flag := service.CheckTxtLength(commentUser.Txt)
-	if !flag {
-		tool.RespErrorWithDate(c, "评论过长(大于20字)")
-		return
-	}
-	flag = service.CheckSensitiveWords(commentUser.Txt)
-	if !flag {
-		tool.RespErrorWithDate(c, "评论包含敏感词")
-		return
-	}
-
 	err = service.AddComment(commentUser)
 	if err != nil {
 		fmt.Println("insert comment failed,err:", err)
@@ -81,7 +70,7 @@ func deleteComment(c *gin.Context) {
 		return
 	}
 
-	err = service.DeleteComment(commentUser.CommentId, commentUser.PostID)
+	err = service.DeleteComment(commentUser)
 	if err != nil {
 		fmt.Println("select commentId failed, err:", err)
 		tool.RespInternetError(c)
@@ -116,11 +105,6 @@ func changeComment(c *gin.Context) {
 		tool.RespErrorWithDate(c, "评论过长(大于20字)")
 		return
 	}
-	flag = service.CheckSensitiveWords(newComment)
-	if !flag {
-		tool.RespErrorWithDate(c, "评论包含敏感词")
-		return
-	}
 
 	commentUser.CommentId, err = service.SelectCommentID(commentUser)
 	if err != nil {
@@ -133,7 +117,7 @@ func changeComment(c *gin.Context) {
 		return
 	}
 
-	err = service.ChangeComment(newComment, commentUser.CommentId)
+	err = service.ChangeComment(newComment, commentUser)
 	if err != nil {
 		fmt.Println("changeComment failed, err :", err)
 		tool.RespInternetError(c)

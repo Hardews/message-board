@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"message-board/model"
+	"strconv"
 )
 
 func Post(username, userPost string) error {
@@ -22,40 +23,24 @@ func DeletePost(PostID int, userPost string) error {
 	if err != nil {
 		return err
 	}
+
+	sqlStr = "drop table post?;" //都删除留言了，再留着这个表没啥意义
+	_, err = dB.Exec(sqlStr, PostID)
 	return nil
-}
-
-func GetAllPost() (error, []model.Post, []string) {
-	var users []model.Post
-	var user model.Post
-	var Time []string
-	var time string
-	sqlStr1 := "select username,userPost,time,PostLikeNum from userPost"
-	rows, err := dB.Query(sqlStr1)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			err = nil
-			return err, users, Time
-		}
-		return err, users, Time
-	}
-
-	defer rows.Close()
-
-	for rows.Next() {
-		err := rows.Scan(&user.Username, &user.Txt, &time, &user.LikeNum)
-		if err != nil {
-			return err, users, Time
-		}
-		users = append(users, user)
-		Time = append(Time, time)
-	}
-	return err, users, Time
 }
 
 func ChangePost(newPost string, PostID int) error {
 	sqlStr := "update userPost set userPost = ? where postID = ?"
 	_, err := dB.Exec(sqlStr, newPost, PostID)
+	if err != nil {
+		return err
+	}
+
+	strNum := "post" + strconv.Itoa(PostID)
+	sqlStrM := "update " + strNum + " set txt = ? where id = 1"
+	sqlStr = sqlStrM
+
+	_, err = dB.Exec(sqlStr, PostID, newPost)
 	if err != nil {
 		return err
 	}
@@ -72,33 +57,34 @@ func SelectByPostId(postName, userPost string) (int, error) {
 	return u.PostID, err
 }
 
-func SelectPostAndCommentByPostID(postId int) (error, []model.Post, []model.Comment) {
+func SelectCommentsSection(PostID int) (error, []model.Post) {
 	var posts []model.Post
-	var comments []model.Comment
-	sqlStr := "select username,userPost,commentName,comment,postLikeNum,commentLikeNum from userComment,userPost where userPost.ID=?=userComment.PostID;"
-	rows, err := dB.Query(sqlStr, postId)
+
+	strNum := "post" + strconv.Itoa(PostID)
+	sqlStrM := "select * from " + strNum
+	sqlStr := sqlStrM
+
+	rows, err := dB.Query(sqlStr)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			err = nil
-			return err, posts, comments
+			return err, posts
 		}
-		return err, posts, comments
+		return err, posts
 	}
 
 	defer rows.Close()
 
 	for rows.Next() {
 		var post model.Post
-		var comment model.Comment
-		err := rows.Scan(&post.Username, &post.Txt, &comment.Username, &comment.Txt, &post.LikeNum, &comment.LikeNum)
+		err := rows.Scan(&post.PostID, &post.Username, &post.Txt, &post.LikeNum)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				return err, posts, comments
+				return err, posts
 			}
 		}
 
 		posts = append(posts, post)
-		comments = append(comments, comment)
 	}
-	return err, posts, comments
+	return err, posts
 }

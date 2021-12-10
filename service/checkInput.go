@@ -2,7 +2,6 @@ package service
 
 import (
 	"message-board/model"
-	"strings"
 )
 
 func CheckPasswordLength(password string) bool {
@@ -26,7 +25,7 @@ func CheckTxtLength(TXT string) bool {
 	return true
 }
 
-func CheckSensitiveWords(txt string) bool {
+/*func CheckSensitiveWords(txt string) bool {
 	var SensitiveWords = make([]string, 0)
 	SensitiveWords = append(SensitiveWords, "fuck")
 	SensitiveWords = append(SensitiveWords, "傻逼")
@@ -60,6 +59,8 @@ func CheckInfoBySensitiveWord(userInfo model.UserInfo) bool {
 	}
 	return true
 }
+
+*/
 
 func CheckInfoLength(userInfo model.UserInfo) bool {
 	flag := CheckTxtLength(userInfo.Name)

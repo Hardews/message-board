@@ -43,14 +43,3 @@ func RespSuccessfulWithUsernameAndDate(c *gin.Context, username string, date, ti
 		"likeNum":  likeNum,
 	})
 }
-
-func RespPostAndComment(c *gin.Context, postName, postTxt, commentName, comment string, likeNum, cLikeNum int) {
-	c.JSON(http.StatusOK, gin.H{
-		"postName":       postName,
-		"postTxt":        postTxt,
-		"postLikeNum":    likeNum,
-		"commentName":    commentName,
-		"comment":        comment,
-		"commentLikeNum": cLikeNum,
-	})
-}

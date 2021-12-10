@@ -7,6 +7,7 @@ import (
 	"message-board/model"
 	"message-board/service"
 	"message-board/tool"
+	"net/http"
 	"time"
 )
 
@@ -17,17 +18,6 @@ func Post(c *gin.Context) {
 	postUser.Username = iUsername.(string)
 	postUser.Txt = c.PostForm("userPost")
 
-	flag := service.CheckTxtLength(postUser.Txt)
-	if !flag {
-		tool.RespErrorWithDate(c, "留言过长(大于20字)")
-		return
-	}
-	flag = service.CheckSensitiveWords(postUser.Txt)
-	if !flag {
-		tool.RespErrorWithDate(c, "留言包含敏感词汇")
-		return
-	}
-
 	err := service.AddPost(postUser.Username, postUser.Txt)
 	if err != nil {
 		fmt.Println("insert post failed,err:", err)
@@ -35,33 +25,9 @@ func Post(c *gin.Context) {
 		return
 	}
 
-	tool.RespSuccessfulWithUsernameAndDate(c, postUser.Username, "留言成功！", time.Now(), postUser.LikeNum)
-}
-
-func GetOnesPost(c *gin.Context) {
-	postUser.Username = c.PostForm("wantGetPostUsername")
-	postUser.Txt = c.PostForm("postTxt")
-
-	PostID, err := service.SelectByPostID(postUser.Username, postUser.Txt)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			tool.RespErrorWithDate(c, "暂时没有留言")
-			return
-		}
-		fmt.Println("get ones post failed,err:", err)
-		tool.RespInternetError(c)
-		return
-	}
-
-	err, posts, comments := service.GetPost(PostID)
-	if err != nil {
-		fmt.Println("get post failed at slice,err:", err)
-		tool.RespInternetError(c)
-		return
-	}
-	for i, _ := range posts {
-		tool.RespPostAndComment(c, posts[i].Username, posts[i].Txt, comments[i].Username, comments[i].Txt, posts[i].LikeNum, comments[i].LikeNum)
-	}
+	ID, _ := service.SelectByPostID(postUser.Username, postUser.Txt)
+	err = service.CreateCommentsSection(ID, postUser)
+	tool.RespSuccessfulWithDate(c, "创建留言区成功")
 }
 
 func DeletePost(c *gin.Context) {
@@ -106,11 +72,6 @@ func changePost(c *gin.Context) {
 		tool.RespErrorWithDate(c, "留言过长(大于20字)")
 		return
 	}
-	flag = service.CheckSensitiveWords(newPost)
-	if !flag {
-		tool.RespErrorWithDate(c, "留言包含敏感词汇")
-		return
-	}
 
 	err = service.ChangePost(newPost, PostID)
 	if err != nil {
@@ -118,22 +79,36 @@ func changePost(c *gin.Context) {
 		tool.RespInternetError(c)
 		return
 	}
-
 	tool.RespSuccessfulWithUsernameAndDate(c, postUser.Username, "更改留言成功", time.Now(), postUser.LikeNum)
 }
 
-func getAllPost(c *gin.Context) {
-	err, userPosts, Time := service.GetAllPost()
+func GetOnesPost(c *gin.Context) {
+	postUser.Username = c.PostForm("wantGetPostUsername")
+	postUser.Txt = c.PostForm("postTxt")
+
+	PostID, err := service.SelectByPostID(postUser.Username, postUser.Txt)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			tool.RespErrorWithDate(c, "竟然没留言")
+			tool.RespErrorWithDate(c, "暂时没有这个评论区")
 			return
 		}
-		fmt.Println("getAllPost failed, err :", err)
+		fmt.Println("get ones post failed,err:", err)
 		tool.RespInternetError(c)
 		return
 	}
-	for i, _ := range userPosts {
-		tool.RespSuccessfulWithUsernameAndDate(c, userPosts[i].Username, userPosts[i].Txt, Time[i], userPosts[i].LikeNum)
+
+	err, commentsSection := service.GetPost(PostID)
+	if err != nil {
+		fmt.Println("get post failed at slice,err:", err)
+		tool.RespInternetError(c)
+		return
+	}
+	for i, _ := range commentsSection {
+		c.JSON(http.StatusOK, gin.H{
+			"level":    i,
+			"username": commentsSection[i].Username,
+			"txt":      commentsSection[i].Txt,
+			"likeNum":  commentsSection[i].LikeNum,
+		})
 	}
 }

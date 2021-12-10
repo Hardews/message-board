@@ -1,6 +1,9 @@
 package dao
 
-import "message-board/model"
+import (
+	"message-board/model"
+	"strconv"
+)
 
 func AddComment(commentUser model.Comment) error {
 	sqlStr := "insert into userComment (postid,commentName,comment) values (?,?,?)"
@@ -8,6 +11,11 @@ func AddComment(commentUser model.Comment) error {
 	if err != nil {
 		return err
 	}
+
+	strNum := "post" + strconv.Itoa(commentUser.PostID)
+	sqlStrM := "insert into " + strNum + " (username,txt,likeNum) values (?,?,?)"
+	sqlStr = sqlStrM
+	_, err = dB.Exec(sqlStr, commentUser.Username, commentUser.Txt, 0)
 	return nil
 }
 
@@ -20,34 +28,30 @@ func DeleteComment(id, PostId int) error {
 	return nil
 }
 
-func SelectComment(username, comment string) (error, bool) {
-	var checkName, CheckComment string
-	sqlStr := "select commentName,comment from userComment where commentName= ?"
-	rows, err := dB.Query(sqlStr, username)
+func DeleteComment2(PostID, id int) error {
+	strNum := "post" + strconv.Itoa(PostID)
+	sqlStrM := "delete txt from " + strNum + " where id = ?"
+	sqlStr := sqlStrM
+
+	_, err := dB.Exec(sqlStr, PostID, id)
 	if err != nil {
-		return err, false
+		return err
 	}
-
-	defer rows.Close()
-
-	for rows.Next() {
-		err := rows.Scan(&checkName, &CheckComment)
-		if checkName == username && CheckComment == comment {
-			return nil, true
-		}
-		if err != nil {
-			return err, false
-		}
-	}
-	return err, false
+	return nil
 }
 
-func ChangeComment(newComment string, commentID int) error {
+func ChangeComment(newComment string, commentID, id int) error {
 	sqlStr := "update userComment set comment = ? where id = ? "
 	_, err := dB.Exec(sqlStr, newComment, commentID)
 	if err != nil {
 		return err
 	}
+
+	strNum := "post" + strconv.Itoa(id)
+	sqlStrM := "update " + strNum + " set comment = ? where id = ?"
+	sqlStr = sqlStrM
+
+	_, err = dB.Exec(sqlStr, newComment, id)
 	return nil
 }
 
@@ -55,6 +59,20 @@ func SelectByCommentId(cUser model.Comment) (error, int) {
 	var id int
 	sqlStr := "select id from userComment where commentName = ? and comment = ? and postID = ?"
 	err := dB.QueryRow(sqlStr, cUser.Username, cUser.Txt, cUser.PostID).Scan(&id)
+	if err != nil {
+		return err, id
+	}
+	return nil, id
+}
+
+func SelectCommentsSectionID(cUser model.Comment) (error, int) {
+	var id int
+
+	strNum := "post" + strconv.Itoa(cUser.PostID)
+	sqlStrM := "select id from " + strNum + " where username = ? and txt = ?"
+	sqlStr := sqlStrM
+
+	err := dB.QueryRow(sqlStr, cUser.Username, cUser.Txt).Scan(&id)
 	if err != nil {
 		return err, id
 	}

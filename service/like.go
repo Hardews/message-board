@@ -17,7 +17,11 @@ func SelectCommentLikeNum(commentId int) (error, int) {
 
 func LikeComment(LikeNum int, info model.Comment, username string) error {
 	LikeNum += 1
-	err := dao.LikeComment(LikeNum, info, username)
+	err, ID := dao.SelectCommentsSectionID(info)
+	if err != nil {
+		return err
+	}
+	err = dao.LikeComment(LikeNum, ID, info, username)
 	if err != nil {
 		return err
 	}

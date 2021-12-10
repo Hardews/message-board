@@ -31,12 +31,6 @@ func Register(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 
-	ok := service.CheckSensitiveWords(username)
-	if !ok {
-		tool.RespErrorWithDate(c, "包含敏感词汇")
-		return
-	}
-
 	err, res := service.CheckUsername(username)
 	if res == false && err == nil {
 		tool.RespErrorWithDate(c, "用户名已存在")
@@ -119,12 +113,7 @@ func writeInfo(c *gin.Context) {
 	userInfo.Specialty = c.PostForm("Specialty")
 	userInfo.School = c.PostForm("University")
 
-	flag := service.CheckInfoBySensitiveWord(userInfo)
-	if !flag {
-		tool.RespErrorWithDate(c, "提交信息包含敏感词汇")
-		return
-	}
-	flag = service.CheckInfoLength(userInfo)
+	flag := service.CheckInfoLength(userInfo)
 	if !flag {
 		tool.RespErrorWithDate(c, "提交了过长信息(大于20字)")
 		return
@@ -172,12 +161,7 @@ func changeInfo(c *gin.Context) {
 		return
 	}
 
-	flag := service.CheckInfoBySensitiveWord(newUserInfo)
-	if !flag {
-		tool.RespErrorWithDate(c, "提交信息包含敏感词汇")
-		return
-	}
-	flag = service.CheckInfoLength(newUserInfo)
+	flag := service.CheckInfoLength(newUserInfo)
 	if !flag {
 		tool.RespErrorWithDate(c, "提交了过长信息(大于20字)")
 		return
