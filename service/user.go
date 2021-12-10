@@ -65,8 +65,8 @@ func GetInfo(username string) (model.UserInfo, error) {
 	return userInfo, err
 }
 
-func ChangeInfo(newInfo model.UserInfo, username string) (bool, error) {
-	err := dao.ChangeUserInfo(newInfo, username)
+func ChangeInfo(newInfo model.UserInfo) (bool, error) {
+	err := dao.ChangeUserInfo(newInfo)
 	if err != nil {
 		return false, err
 	}
@@ -79,4 +79,27 @@ func ChangePassword(username, newPassword string) error {
 		return err
 	}
 	return err
+}
+
+func CheckInputInfo(username string, newUserInfo model.UserInfo) (error, model.UserInfo) {
+	UserInfo, err := GetInfo(username)
+
+	newUserInfo.Id = UserInfo.Id
+
+	if err != nil {
+		return err, UserInfo
+	}
+	if len(newUserInfo.Name) == 0 {
+		newUserInfo.Name = UserInfo.Name
+	}
+	if len(newUserInfo.Professional) == 0 {
+		newUserInfo.Professional = UserInfo.Professional
+	}
+	if len(newUserInfo.Specialty) == 0 {
+		newUserInfo.Specialty = UserInfo.Specialty
+	}
+	if len(newUserInfo.School) == 0 {
+		newUserInfo.School = UserInfo.School
+	}
+	return nil, newUserInfo
 }

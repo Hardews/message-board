@@ -47,16 +47,16 @@ func WriteUserInfoIN(userInfo model.UserInfo, username string) error {
 func GetUserInfo(username string) (model.UserInfo, error) {
 	var user model.UserInfo
 	sqlStr := "select * from userExtraInfo where username = ?"
-	err := dB.QueryRow(sqlStr, username).Scan(&user.Id, &user.Name, &user.Professional, &user.School, &user.Specialty)
+	err := dB.QueryRow(sqlStr, username).Scan(&user.Id, &username, &user.Name, &user.Professional, &user.School, &user.Specialty)
 	if err != nil {
 		return user, err
 	}
 	return user, err
 }
 
-func ChangeUserInfo(userInfo model.UserInfo, username string) error {
-	sqlStr := "update userExtraInfo set Name=? and Professional=? and School=? and Specialty=? where username = ?"
-	_, err := dB.Exec(sqlStr, userInfo.Name, userInfo.Professional, userInfo.School, userInfo.Specialty, username)
+func ChangeUserInfo(userInfo model.UserInfo) error {
+	sqlStr := "update userExtraInfo set Name = ? ,Professional=? ,School=? ,Specialty=? where id = ?"
+	_, err := dB.Exec(sqlStr, userInfo.Name, userInfo.Professional, userInfo.School, userInfo.Specialty, userInfo.Id)
 	if err != nil {
 		return err
 	}

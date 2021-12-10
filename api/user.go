@@ -138,22 +138,24 @@ func getInfo(c *gin.Context) {
 }
 
 func changeInfo(c *gin.Context) {
+	var err error
 	iUsername, _ := c.Get("username")
 	username := iUsername.(string)
-
-	newUserInfo, err := service.GetInfo(username)
-	if err != nil {
-		fmt.Println("get userinfo failed , err :", err)
-		tool.RespInternetError(c)
-		return
-	}
+	var newUserInfo model.UserInfo
 
 	newUserInfo.Name = c.PostForm("newName")
 	newUserInfo.Professional = c.PostForm("newProfessional")
 	newUserInfo.Specialty = c.PostForm("newSpecialty")
 	newUserInfo.School = c.PostForm("newUniversity")
 
-	flag, err := service.ChangeInfo(newUserInfo, username)
+	err, newUserInfo = service.CheckInputInfo(username, newUserInfo)
+	if err != nil {
+		fmt.Println("check input info failed,err", err)
+		tool.RespInternetError(c)
+		return
+	}
+
+	flag, err := service.ChangeInfo(newUserInfo)
 	if err != nil {
 		fmt.Println("change userinfo failed , err :", err)
 		tool.RespInternetError(c)
