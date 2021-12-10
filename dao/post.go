@@ -30,7 +30,7 @@ func GetAllPost() (error, []model.Post, []string) {
 	var user model.Post
 	var Time []string
 	var time string
-	sqlStr1 := "select username,userPost,time,LikeNum from userPost"
+	sqlStr1 := "select username,userPost,time,PostLikeNum from userPost"
 	rows, err := dB.Query(sqlStr1)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -72,20 +72,10 @@ func SelectByPostId(postName, userPost string) (int, error) {
 	return u.PostID, err
 }
 
-func GetPost(username string) error {
-	var u model.Post
-	sqlStr := "select userPost from userPost where username=? "
-	err := dB.QueryRow(sqlStr, username).Scan(&u.Txt)
-	if err != nil {
-		return err
-	}
-	return err
-}
-
 func SelectPostAndCommentByPostID(postId int) (error, []model.Post, []model.Comment) {
 	var posts []model.Post
 	var comments []model.Comment
-	sqlStr := "select username,userPost,commentName,comment from userComment,userPost where userPost.ID=?=userComment.PostID;"
+	sqlStr := "select username,userPost,commentName,comment,postLikeNum,commentLikeNum from userComment,userPost where userPost.ID=?=userComment.PostID;"
 	rows, err := dB.Query(sqlStr, postId)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -100,7 +90,7 @@ func SelectPostAndCommentByPostID(postId int) (error, []model.Post, []model.Comm
 	for rows.Next() {
 		var post model.Post
 		var comment model.Comment
-		err := rows.Scan(&post.Username, &post.Txt, &comment.Username, &comment.Txt)
+		err := rows.Scan(&post.Username, &post.Txt, &comment.Username, &comment.Txt, &post.LikeNum, &comment.LikeNum)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				return err, posts, comments

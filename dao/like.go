@@ -5,7 +5,7 @@ import (
 )
 
 func SelectCommentLikeNum(id int, user model.Comment) (int, error) {
-	sqlStr := "select likeNum from userComment where id = ?"
+	sqlStr := "select commentLikeNum from userComment where id = ?"
 	err := dB.QueryRow(sqlStr, id).Scan(&user.LikeNum)
 	if err != nil {
 		return 0, err
@@ -15,7 +15,7 @@ func SelectCommentLikeNum(id int, user model.Comment) (int, error) {
 }
 
 func LikeComment(LikeNum int, info model.Comment, username string) error {
-	sqlStr1 := "update userComment set likeNum = ? where id = ?"
+	sqlStr1 := "update userComment set commentLikeNum = ? where id = ?"
 	_, err := dB.Exec(sqlStr1, LikeNum, info.CommentId)
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func LikeComment(LikeNum int, info model.Comment, username string) error {
 }
 
 func SelectPostLikeNum(id int, user model.Post) (int, error) {
-	sqlStr := "select likeNum from userPost where id = ?"
+	sqlStr := "select postLikeNum from userPost where id = ?"
 	err := dB.QueryRow(sqlStr, id).Scan(&user.LikeNum)
 	if err != nil {
 		return 0, err
@@ -40,7 +40,7 @@ func SelectPostLikeNum(id int, user model.Post) (int, error) {
 }
 
 func LikePost(LikeNum, PostID int, username string) error {
-	sqlStr1 := "update userPost set likeNum = ? where id = ?"
+	sqlStr1 := "update userPost set postLikeNum = ? where id = ?"
 	_, err := dB.Exec(sqlStr1, LikeNum, PostID)
 	if err != nil {
 		return err
