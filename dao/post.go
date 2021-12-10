@@ -85,7 +85,7 @@ func GetPost(username string) error {
 func SelectPostAndCommentByPostID(postId int) (error, []model.Post, []model.Comment) {
 	var posts []model.Post
 	var comments []model.Comment
-	sqlStr := "select username,userPost,commentName,comment from userComment,userPost where userComment.PostID=?=userPost.ID;"
+	sqlStr := "select username,userPost,commentName,comment from userComment,userPost where userPost.ID=?=userComment.PostID;"
 	rows, err := dB.Query(sqlStr, postId)
 	if err != nil {
 		if err == sql.ErrNoRows {
