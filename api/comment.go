@@ -118,5 +118,5 @@ func changeComment(c *gin.Context) {
 		return
 	}
 
-	tool.RespSuccessfulWithUsernameAndDate(c, commentUser.Username, "修改评论成功", time.Now())
+	tool.RespSuccessfulWithUsernameAndDate(c, commentUser.Username, "修改评论成功", time.Now(), commentUser.LikeNum)
 }

@@ -8,4 +8,5 @@ type Comment struct {
 	Username  string
 	PostID    int
 	Time      time.Time
+	LikeNum   int
 }

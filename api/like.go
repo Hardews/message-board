@@ -81,7 +81,7 @@ func LikePost(c *gin.Context) {
 		return
 	}
 
-	err = service.LikePost(likeNum, postUser, username)
+	err = service.LikePost(likeNum, PostID, username)
 	if err != nil {
 		fmt.Println("insert post like failed ,err :", err)
 		tool.RespInternetError(c)

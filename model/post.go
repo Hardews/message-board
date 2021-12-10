@@ -7,4 +7,5 @@ type Post struct {
 	Txt      string
 	Username string
 	PostTime time.Time
+	LikeNum  int
 }

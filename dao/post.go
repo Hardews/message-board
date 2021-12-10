@@ -30,7 +30,7 @@ func GetAllPost() (error, []model.Post, []string) {
 	var user model.Post
 	var Time []string
 	var time string
-	sqlStr1 := "select username,userPost,time from userPost"
+	sqlStr1 := "select username,userPost,time,LikeNum from userPost"
 	rows, err := dB.Query(sqlStr1)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -43,7 +43,7 @@ func GetAllPost() (error, []model.Post, []string) {
 	defer rows.Close()
 
 	for rows.Next() {
-		err := rows.Scan(&user.Username, &user.Txt, &time)
+		err := rows.Scan(&user.Username, &user.Txt, &time, &user.LikeNum)
 		if err != nil {
 			return err, users, Time
 		}

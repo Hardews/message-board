@@ -24,7 +24,7 @@ func Post(c *gin.Context) {
 		return
 	}
 
-	tool.RespSuccessfulWithUsernameAndDate(c, postUser.Username, "留言成功！", time.Now())
+	tool.RespSuccessfulWithUsernameAndDate(c, postUser.Username, "留言成功！", time.Now(), postUser.LikeNum)
 }
 
 func GetOnesPost(c *gin.Context) {
@@ -49,7 +49,7 @@ func GetOnesPost(c *gin.Context) {
 		return
 	}
 	for i, _ := range posts {
-		tool.RespPostAndComment(c, posts[i].Username, posts[i].Txt, comments[i].Username, comments[i].Txt)
+		tool.RespPostAndComment(c, posts[i].Username, posts[i].Txt, comments[i].Username, comments[i].Txt, posts[i].LikeNum, comments[i].LikeNum)
 	}
 }
 
@@ -97,7 +97,7 @@ func changePost(c *gin.Context) {
 		return
 	}
 
-	tool.RespSuccessfulWithUsernameAndDate(c, postUser.Username, "更改留言成功", time.Now())
+	tool.RespSuccessfulWithUsernameAndDate(c, postUser.Username, "更改留言成功", time.Now(), postUser.LikeNum)
 }
 
 func getAllPost(c *gin.Context) {
@@ -112,6 +112,6 @@ func getAllPost(c *gin.Context) {
 		return
 	}
 	for i, _ := range userPosts {
-		tool.RespSuccessfulWithUsernameAndDate(c, userPosts[i].Username, userPosts[i].Txt, Time[i])
+		tool.RespSuccessfulWithUsernameAndDate(c, userPosts[i].Username, userPosts[i].Txt, Time[i], userPosts[i].LikeNum)
 	}
 }

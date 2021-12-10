@@ -7,15 +7,16 @@ import (
 
 func SelectCommentLikeNum(commentId int) (error, int) {
 	var err error
-	var user model.Like
-	user.CommentLikeNum, err = dao.SelectCommentLikeNum(commentId, user)
+	var user model.Comment
+	user.LikeNum, err = dao.SelectCommentLikeNum(commentId, user)
 	if err != nil {
-		return err, user.CommentLikeNum
+		return err, user.LikeNum
 	}
-	return err, user.CommentLikeNum
+	return err, user.LikeNum
 }
 
 func LikeComment(LikeNum int, info model.Comment, username string) error {
+	LikeNum += 1
 	err := dao.LikeComment(LikeNum, info, username)
 	if err != nil {
 		return err
@@ -25,16 +26,17 @@ func LikeComment(LikeNum int, info model.Comment, username string) error {
 
 func SelectPostNum(postId int) (error, int) {
 	var err error
-	var user model.Like
-	user.PostLikeNum, err = dao.SelectPostLikeNum(postId, user)
+	var user model.Post
+	user.LikeNum, err = dao.SelectPostLikeNum(postId, user)
 	if err != nil {
-		return err, user.PostLikeNum
+		return err, user.LikeNum
 	}
-	return err, user.PostLikeNum
+	return err, user.LikeNum
 }
 
-func LikePost(LikeNum int, info model.Post, username string) error {
-	err := dao.LikePost(LikeNum, info, username)
+func LikePost(LikeNum, postID int, username string) error {
+	LikeNum += 1
+	err := dao.LikePost(LikeNum, postID, username)
 	if err != nil {
 		return err
 	}
