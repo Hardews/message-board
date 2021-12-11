@@ -18,6 +18,17 @@ func Post(c *gin.Context) {
 	postUser.Username = iUsername.(string)
 	postUser.Txt = c.PostForm("userPost")
 
+	flag := service.CheckSensitiveWords(postUser.Txt)
+	if !flag {
+		tool.RespErrorWithDate(c, "留言含有敏感词")
+		return
+	}
+	flag = service.CheckTxtLength(postUser.Txt)
+	if !flag {
+		tool.RespErrorWithDate(c, "留言过长")
+		return
+	}
+
 	err := service.AddPost(postUser.Username, postUser.Txt)
 	if err != nil {
 		fmt.Println("insert post failed,err:", err)
@@ -70,6 +81,11 @@ func changePost(c *gin.Context) {
 	flag := service.CheckTxtLength(newPost)
 	if !flag {
 		tool.RespErrorWithDate(c, "留言过长(大于20字)")
+		return
+	}
+	flag = service.CheckSensitiveWords(newPost)
+	if !flag {
+		tool.RespErrorWithDate(c, "留言含有敏感词")
 		return
 	}
 

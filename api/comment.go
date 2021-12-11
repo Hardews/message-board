@@ -21,6 +21,17 @@ func addComment(c *gin.Context) {
 	postTxt := c.PostForm("postTxt")
 	commentUser.Txt = c.PostForm("comment")
 
+	flag := service.CheckTxtLength(commentUser.Txt)
+	if !flag {
+		tool.RespErrorWithDate(c, "评论过长")
+		return
+	}
+	flag = service.CheckSensitiveWords(commentUser.Txt)
+	if !flag {
+		tool.RespErrorWithDate(c, "评论含有敏感词")
+		return
+	}
+
 	commentUser.PostID, err = service.SelectByPostID(postName, postTxt)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -102,7 +113,12 @@ func changeComment(c *gin.Context) {
 
 	flag := service.CheckTxtLength(newComment)
 	if !flag {
-		tool.RespErrorWithDate(c, "评论过长(大于20字)")
+		tool.RespErrorWithDate(c, "评论过长")
+		return
+	}
+	flag = service.CheckSensitiveWords(newComment)
+	if !flag {
+		tool.RespErrorWithDate(c, "评论含有敏感词")
 		return
 	}
 

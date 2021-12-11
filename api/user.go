@@ -31,6 +31,15 @@ func Register(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 
+	flag := service.CheckSensitiveWords(username)
+	if !flag {
+		tool.RespErrorWithDate(c, "用户名含敏感词")
+	}
+	flag = service.CheckUsernameLength(username)
+	if !flag {
+		tool.RespErrorWithDate(c, "用户名长度不符合要求")
+	}
+
 	err, res := service.CheckUsername(username)
 	if res == false && err == nil {
 		tool.RespErrorWithDate(c, "用户名已存在")
@@ -41,9 +50,9 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	flag := service.CheckPasswordLength(password)
+	flag = service.CheckPasswordLength(password)
 	if !flag {
-		tool.RespErrorWithDate(c, "密码长度不足")
+		tool.RespErrorWithDate(c, "密码长度不符合要求")
 		return
 	}
 
@@ -82,7 +91,7 @@ func changePassword(c *gin.Context) {
 
 	flag := service.CheckPasswordLength(newPassword)
 	if !flag {
-		tool.RespErrorWithDate(c, "密码长度不足")
+		tool.RespErrorWithDate(c, "密码长度不符合要求")
 		return
 	}
 
@@ -115,7 +124,12 @@ func writeInfo(c *gin.Context) {
 
 	flag := service.CheckInfoLength(userInfo)
 	if !flag {
-		tool.RespErrorWithDate(c, "提交了过长信息(大于20字)")
+		tool.RespErrorWithDate(c, "提交了过长信息")
+		return
+	}
+	flag = service.CheckInfoBySensitiveWord(userInfo)
+	if !flag {
+		tool.RespErrorWithDate(c, "提交信息含敏感词汇")
 		return
 	}
 
@@ -153,7 +167,6 @@ func changeInfo(c *gin.Context) {
 	newUserInfo.Professional = c.PostForm("newProfessional")
 	newUserInfo.Specialty = c.PostForm("newSpecialty")
 	newUserInfo.School = c.PostForm("newUniversity")
-
 	err, newUserInfo = service.CheckInputInfo(username, newUserInfo)
 	if err != nil {
 		fmt.Println("check input info failed,err", err)
@@ -163,7 +176,12 @@ func changeInfo(c *gin.Context) {
 
 	flag := service.CheckInfoLength(newUserInfo)
 	if !flag {
-		tool.RespErrorWithDate(c, "提交了过长信息(大于20字)")
+		tool.RespErrorWithDate(c, "提交了过长信息")
+		return
+	}
+	flag = service.CheckInfoBySensitiveWord(newUserInfo)
+	if !flag {
+		tool.RespErrorWithDate(c, "提交信息含有敏感词")
 		return
 	}
 
