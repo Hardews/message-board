@@ -9,7 +9,6 @@ import (
 )
 
 func LikeComment(c *gin.Context) {
-	var err error
 	iUsername, _ := c.Get("username")
 	username := iUsername.(string)
 
@@ -18,7 +17,7 @@ func LikeComment(c *gin.Context) {
 	commentUser.Username = c.PostForm("commentName")
 	commentUser.Txt = c.PostForm("comment")
 
-	commentUser.PostID, err = service.SelectByPostID(postName, postTxt)
+	postUser, err = service.SelectAllByPostID(postName, postTxt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			tool.RespErrorWithDate(c, "无此用户或留言")
@@ -63,7 +62,7 @@ func LikePost(c *gin.Context) {
 	postUser.Username = c.PostForm("wantGetPostUsername")
 	postUser.Txt = c.PostForm("postTxt")
 
-	PostID, err := service.SelectByPostID(postUser.Username, postUser.Txt)
+	postUser, err = service.SelectAllByPostID(postUser.Username, postUser.Txt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			tool.RespErrorWithDate(c, "暂时没有留言")
@@ -74,14 +73,14 @@ func LikePost(c *gin.Context) {
 		return
 	}
 
-	err, likeNum := service.SelectPostNum(PostID)
+	err, likeNum := service.SelectPostNum(postUser.PostID)
 	if err != nil {
 		fmt.Println("get post like num failed ,err", err)
 		tool.RespInternetError(c)
 		return
 	}
 
-	err = service.LikePost(likeNum, PostID, username)
+	err = service.LikePost(likeNum, postUser.PostID, username)
 	if err != nil {
 		fmt.Println("insert post like failed ,err :", err)
 		tool.RespInternetError(c)

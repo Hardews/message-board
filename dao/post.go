@@ -1,10 +1,8 @@
 package dao
 
 import (
-	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"message-board/model"
-	"strconv"
 )
 
 func Post(username, userPost string) error {
@@ -23,9 +21,6 @@ func DeletePost(PostID int, userPost string) error {
 	if err != nil {
 		return err
 	}
-
-	sqlStr = "drop table post?;" //都删除留言了，再留着这个表没啥意义
-	_, err = dB.Exec(sqlStr, PostID)
 	return nil
 }
 
@@ -36,55 +31,37 @@ func ChangePost(newPost string, PostID int) error {
 		return err
 	}
 
-	strNum := "post" + strconv.Itoa(PostID)
-	sqlStrM := "update " + strNum + " set txt = ? where id = 1"
-	sqlStr = sqlStrM
-
-	_, err = dB.Exec(sqlStr, PostID, newPost)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
-func SelectByPostId(postName, userPost string) (int, error) {
+func SelectAllByPostId(postName, userPost string) (model.Post, error) {
 	var u model.Post
-	sqlStr := "select id from userPost where username= ? and userPost= ?"
-	err := dB.QueryRow(sqlStr, postName, userPost).Scan(&u.PostID)
+	sqlStr := "select * from userPost where username= ? and userPost= ?"
+	err := dB.QueryRow(sqlStr, postName, userPost).Scan(&u.PostID, &u.Username, &u.Txt, &u.LikeNum, &u.PostTime)
 	if err != nil {
-		return u.PostID, err
+		return u, err
 	}
-	return u.PostID, err
+	return u, err
 }
 
-func SelectCommentsSection(PostID int) (error, []model.Post) {
-	var posts []model.Post
+func GetCommentsSection(PostID int) (error, []model.Comment) {
+	var comments []model.Comment
 
-	strNum := "post" + strconv.Itoa(PostID)
-	sqlStrM := "select * from " + strNum
-	sqlStr := sqlStrM
-
-	rows, err := dB.Query(sqlStr)
+	sqlStr := "select id,comment,time,commentName,commentLikeNum from usercomment where PostID = ?"
+	rows, err := dB.Query(sqlStr, PostID)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			err = nil
-			return err, posts
-		}
-		return err, posts
+		return err, comments
 	}
 
 	defer rows.Close()
 
 	for rows.Next() {
-		var post model.Post
-		err := rows.Scan(&post.PostID, &post.Username, &post.Txt, &post.LikeNum)
+		var comment model.Comment
+		err = rows.Scan(&comment.CommentId, &comment.Txt, &comment.Time, &comment.Username, &comment.LikeNum)
 		if err != nil {
-			if err == sql.ErrNoRows {
-				return err, posts
-			}
+			return err, comments
 		}
-
-		posts = append(posts, post)
+		comments = append(comments, comment)
 	}
-	return err, posts
+	return err, comments
 }

@@ -27,27 +27,21 @@ func DeleteComment(cUser model.Comment) error {
 		return err
 	}
 
-	err, id := dao.SelectCommentsSectionID(cUser)
-	if err != nil {
-		return err
-	}
+	return err
+}
 
-	err = dao.DeleteComment2(cUser.PostID, id)
+func ChangeComment(newComment string, cUser model.Comment) error {
+	err := dao.ChangeComment(newComment, cUser.CommentId)
 	if err != nil {
 		return err
 	}
 	return err
 }
 
-func ChangeComment(newComment string, cUser model.Comment) error {
-	err, id := dao.SelectCommentsSectionID(cUser)
+func SelectByPostID(username, txt string) (int, error) {
+	id, err := dao.SelectByPostID(username, txt)
 	if err != nil {
-		return err
+		return id, err
 	}
-
-	err = dao.ChangeComment(newComment, cUser.CommentId, id)
-	if err != nil {
-		return err
-	}
-	return err
+	return id, err
 }

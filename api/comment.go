@@ -13,7 +13,6 @@ import (
 var commentUser model.Comment
 
 func addComment(c *gin.Context) {
-	var err error
 	iUsername, _ := c.Get("username")
 	commentUser.Username = iUsername.(string)
 

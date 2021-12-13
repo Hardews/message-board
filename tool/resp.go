@@ -5,12 +5,6 @@ import (
 	"net/http"
 )
 
-func RespErrorWithNoRows(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"info": "账号不存在",
-	})
-}
-
 func RespErrorWithDate(c *gin.Context, date interface{}) {
 	c.JSON(http.StatusOK, gin.H{
 		"info": date,
@@ -41,5 +35,15 @@ func RespSuccessfulWithUsernameAndDate(c *gin.Context, username string, date, ti
 		"username": username,
 		"post":     date,
 		"likeNum":  likeNum,
+	})
+}
+
+func RespSuccessfulWithInfo(c *gin.Context, txt, username, time string, branch, likeNum int) {
+	c.JSON(http.StatusOK, gin.H{
+		"楼层":  branch,
+		"用户名": username,
+		"内容":  txt,
+		"时间":  time,
+		"点赞数": likeNum,
 	})
 }

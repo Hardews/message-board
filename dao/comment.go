@@ -2,7 +2,6 @@ package dao
 
 import (
 	"message-board/model"
-	"strconv"
 )
 
 func AddComment(commentUser model.Comment) error {
@@ -12,10 +11,6 @@ func AddComment(commentUser model.Comment) error {
 		return err
 	}
 
-	strNum := "post" + strconv.Itoa(commentUser.PostID)
-	sqlStrM := "insert into " + strNum + " (username,txt,likeNum) values (?,?,?)"
-	sqlStr = sqlStrM
-	_, err = dB.Exec(sqlStr, commentUser.Username, commentUser.Txt, 0)
 	return nil
 }
 
@@ -28,30 +23,13 @@ func DeleteComment(id, PostId int) error {
 	return nil
 }
 
-func DeleteComment2(PostID, id int) error {
-	strNum := "post" + strconv.Itoa(PostID)
-	sqlStrM := "delete txt from " + strNum + " where id = ?"
-	sqlStr := sqlStrM
-
-	_, err := dB.Exec(sqlStr, PostID, id)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func ChangeComment(newComment string, commentID, id int) error {
+func ChangeComment(newComment string, commentID int) error {
 	sqlStr := "update userComment set comment = ? where id = ? "
 	_, err := dB.Exec(sqlStr, newComment, commentID)
 	if err != nil {
 		return err
 	}
 
-	strNum := "post" + strconv.Itoa(id)
-	sqlStrM := "update " + strNum + " set comment = ? where id = ?"
-	sqlStr = sqlStrM
-
-	_, err = dB.Exec(sqlStr, newComment, id)
 	return nil
 }
 
@@ -65,16 +43,12 @@ func SelectByCommentId(cUser model.Comment) (error, int) {
 	return nil, id
 }
 
-func SelectCommentsSectionID(cUser model.Comment) (error, int) {
-	var id int
-
-	strNum := "post" + strconv.Itoa(cUser.PostID)
-	sqlStrM := "select id from " + strNum + " where username = ? and txt = ?"
-	sqlStr := sqlStrM
-
-	err := dB.QueryRow(sqlStr, cUser.Username, cUser.Txt).Scan(&id)
+func SelectByPostID(postName, userPost string) (int, error) {
+	var u model.Comment
+	sqlStr := "select id from userPost where username= ? and userPost= ?"
+	err := dB.QueryRow(sqlStr, postName, userPost).Scan(&u.PostID)
 	if err != nil {
-		return err, id
+		return u.PostID, err
 	}
-	return nil, id
+	return u.PostID, err
 }

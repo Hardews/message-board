@@ -3,7 +3,6 @@ package dao
 import (
 	_ "github.com/go-sql-driver/mysql"
 	"message-board/model"
-	"strconv"
 )
 
 func SelectByUsername(username string) (error, model.User) {
@@ -58,24 +57,6 @@ func GetUserInfo(username string) (model.UserInfo, error) {
 func ChangeUserInfo(userInfo model.UserInfo) error {
 	sqlStr := "update userExtraInfo set Name = ? ,Professional=? ,School=? ,Specialty=? where id = ?"
 	_, err := dB.Exec(sqlStr, userInfo.Name, userInfo.Professional, userInfo.School, userInfo.Specialty, userInfo.Id)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func CreateCommentsSection(ID int, post model.Post) error {
-	IdStr := strconv.Itoa(ID)
-	sqlStrM := "CREATE TABLE `Post" + IdStr + "` (    `id` BIGINT(20) NOT NULL AUTO_INCREMENT,  `username` VARCHAR(20) DEFAULT '', `txt` VARCHAR(20) DEFAULT '', `likeNum` int(20) DEFAULT 0,  PRIMARY KEY(`id`))ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;"
-	sqlStr := sqlStrM
-	_, err := dB.Exec(sqlStr)
-	if err != nil {
-		return err
-	}
-
-	sqlStrM = "insert into post" + IdStr + " (username,txt,likeNum) values (?,?,?)"
-	sqlStr = sqlStrM
-	_, err = dB.Exec(sqlStr, post.Username, post.Txt, 0)
 	if err != nil {
 		return err
 	}

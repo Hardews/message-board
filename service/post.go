@@ -13,20 +13,12 @@ func AddPost(username, txt string) error {
 	return err
 }
 
-func SelectByPostID(username, txt string) (int, error) {
-	PostID, err := dao.SelectByPostId(username, txt)
+func SelectAllByPostID(username, txt string) (model.Post, error) {
+	user, err := dao.SelectAllByPostId(username, txt)
 	if err != nil {
-		return PostID, err
+		return user, err
 	}
-	return PostID, err
-}
-
-func GetPost(PostID int) (error, []model.Post) {
-	err, posts := dao.SelectCommentsSection(PostID)
-	if err != nil {
-		return err, posts
-	}
-	return err, posts
+	return user, err
 }
 
 func DeletePost(postId int, post string) error {
@@ -45,10 +37,10 @@ func ChangePost(newPost string, PostID int) error {
 	return err
 }
 
-func CreateCommentsSection(ID int, Post model.Post) error {
-	err := dao.CreateCommentsSection(ID, Post)
+func GetCommentsSection(PostID int) (error, []model.Comment) {
+	err, comments := dao.GetCommentsSection(PostID)
 	if err != nil {
-		return err
+		return err, comments
 	}
-	return err
+	return err, comments
 }

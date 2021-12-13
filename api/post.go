@@ -7,11 +7,11 @@ import (
 	"message-board/model"
 	"message-board/service"
 	"message-board/tool"
-	"net/http"
 	"time"
 )
 
 var postUser model.Post
+var err error
 
 func Post(c *gin.Context) {
 	iUsername, _ := c.Get("username")
@@ -36,22 +36,20 @@ func Post(c *gin.Context) {
 		return
 	}
 
-	ID, _ := service.SelectByPostID(postUser.Username, postUser.Txt)
-	err = service.CreateCommentsSection(ID, postUser)
-	tool.RespSuccessfulWithDate(c, "创建留言区成功")
+	tool.RespSuccessfulWithDate(c, "发布")
 }
 
 func DeletePost(c *gin.Context) {
 	iUsername, _ := c.Get("username")
 	postUser.Username = iUsername.(string)
 	postWantDelete := c.PostForm("post")
-	PostID, err := service.SelectByPostID(postUser.Username, postWantDelete)
+	postUser, err = service.SelectAllByPostID(postUser.Username, postWantDelete)
 	if err != nil {
 		tool.RespErrorWithDate(c, "未查询到该留言")
 		return
 	}
 
-	err = service.DeletePost(PostID, postWantDelete)
+	err = service.DeletePost(postUser.PostID, postWantDelete)
 	if err != nil {
 		fmt.Println("delete post failed , err :", err)
 		tool.RespInternetError(c)
@@ -67,7 +65,7 @@ func changePost(c *gin.Context) {
 	postUser.Txt = c.PostForm("oldPost")
 	newPost := c.PostForm("newPost")
 
-	PostID, err := service.SelectByPostID(postUser.Username, postUser.Txt)
+	postUser, err = service.SelectAllByPostID(postUser.Username, postUser.Txt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			tool.RespErrorWithDate(c, "无留言")
@@ -89,7 +87,7 @@ func changePost(c *gin.Context) {
 		return
 	}
 
-	err = service.ChangePost(newPost, PostID)
+	err = service.ChangePost(newPost, postUser.PostID)
 	if err != nil {
 		fmt.Println("changePost failed, err :", err)
 		tool.RespInternetError(c)
@@ -102,7 +100,7 @@ func GetOnesPost(c *gin.Context) {
 	postUser.Username = c.PostForm("wantGetPostUsername")
 	postUser.Txt = c.PostForm("postTxt")
 
-	PostID, err := service.SelectByPostID(postUser.Username, postUser.Txt)
+	postUser, err = service.SelectAllByPostID(postUser.Username, postUser.Txt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			tool.RespErrorWithDate(c, "暂时没有这个评论区")
@@ -113,18 +111,31 @@ func GetOnesPost(c *gin.Context) {
 		return
 	}
 
-	err, commentsSection := service.GetPost(PostID)
+	//获取下属评论
+	err, comments := service.GetCommentsSection(postUser.PostID)
 	if err != nil {
-		fmt.Println("get post failed at slice,err:", err)
 		tool.RespInternetError(c)
+		fmt.Println("get comments section failed,err :", err)
 		return
 	}
-	for i, _ := range commentsSection {
-		c.JSON(http.StatusOK, gin.H{
-			"level":    i,
-			"username": commentsSection[i].Username,
-			"txt":      commentsSection[i].Txt,
-			"likeNum":  commentsSection[i].LikeNum,
-		})
+
+	//输出第一层，留言
+	root := &model.TreeNode{
+		ID:  postUser.PostID,
+		Txt: postUser.Txt,
+	}
+	tool.RespSuccessfulWithInfo(c, root.Txt, postUser.Username, postUser.PostTime, 1, postUser.LikeNum)
+
+	//遍历，输出评论
+	for i, _ := range comments {
+		branch := &model.TreeNode{
+			ID:      comments[i].CommentId,
+			Name:    comments[i].Username,
+			Txt:     comments[i].Txt,
+			Time:    comments[i].Time,
+			LikeNum: comments[i].LikeNum,
+		}
+		root.Branch = branch
+		tool.RespSuccessfulWithInfo(c, root.Branch.Txt, root.Branch.Name, root.Branch.Time, i+2, root.Branch.LikeNum)
 	}
 }
