@@ -65,3 +65,24 @@ func GetCommentsSection(PostID int) (error, []model.Comment) {
 	}
 	return err, comments
 }
+
+func SelectAllPost() (error, []model.Post) {
+	var posts []model.Post
+	sqlStr := "select * from userPost"
+	rows, err := dB.Query(sqlStr)
+	if err != nil {
+		return err, posts
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var post model.Post
+		err = rows.Scan(&post.PostID, &post.Username, &post.Txt, &post.LikeNum, &post.PostTime)
+		if err != nil {
+			return err, posts
+		}
+		posts = append(posts, post)
+	}
+	return err, posts
+}

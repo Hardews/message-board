@@ -27,6 +27,7 @@ func InitEngine() {
 		PostGroup.POST("/", Post)           //发留言
 		PostGroup.POST("/get", GetOnesPost) //获取某个人的留言及其下属评论
 		PostGroup.DELETE("/", DeletePost)   //删除留言
+		PostGroup.GET("/", GetAllPosts)
 		PostGroup.POST("change", changePost)
 	}
 

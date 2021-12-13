@@ -139,3 +139,20 @@ func GetOnesPost(c *gin.Context) {
 		tool.RespSuccessfulWithInfo(c, root.Branch.Txt, root.Branch.Name, root.Branch.Time, i+2, root.Branch.LikeNum)
 	}
 }
+
+func GetAllPosts(c *gin.Context) {
+	err, userPost := service.GetAllPosts()
+	if err != nil {
+		if err == sql.ErrNoRows {
+			tool.RespErrorWithDate(c, "暂时没有留言")
+			return
+		}
+		fmt.Println("get all posts failed,err:", err)
+		tool.RespInternetError(c)
+		return
+	}
+
+	for i, _ := range userPost {
+		tool.RespSuccessfulWithInfo(c, userPost[i].Txt, userPost[i].Username, userPost[i].PostTime, i, userPost[i].LikeNum)
+	}
+}

@@ -44,3 +44,11 @@ func GetCommentsSection(PostID int) (error, []model.Comment) {
 	}
 	return err, comments
 }
+
+func GetAllPosts() (error, []model.Post) {
+	err, user := dao.SelectAllPost()
+	if err != nil {
+		return err, user
+	}
+	return err, user
+}
