@@ -43,19 +43,19 @@ func CheckSensitiveWords(txt string) bool {
 func CheckInfoBySensitiveWord(userInfo model.UserInfo) bool {
 	// 判断是否含有敏感词汇
 	flag := CheckSensitiveWords(userInfo.Name)
-	if flag {
+	if !flag {
 		return false
 	}
 	flag = CheckSensitiveWords(userInfo.Professional)
-	if flag {
+	if !flag {
 		return false
 	}
 	flag = CheckSensitiveWords(userInfo.Specialty)
-	if flag {
+	if !flag {
 		return false
 	}
 	flag = CheckSensitiveWords(userInfo.Professional)
-	if flag {
+	if !flag {
 		return false
 	}
 	return true
@@ -63,19 +63,19 @@ func CheckInfoBySensitiveWord(userInfo model.UserInfo) bool {
 
 func CheckInfoLength(userInfo model.UserInfo) bool {
 	flag := CheckTxtLength(userInfo.Name)
-	if flag {
+	if !flag {
 		return false
 	}
 	flag = CheckTxtLength(userInfo.Professional)
-	if flag {
+	if !flag {
 		return false
 	}
 	flag = CheckTxtLength(userInfo.Specialty)
-	if flag {
+	if !flag {
 		return false
 	}
 	flag = CheckTxtLength(userInfo.Professional)
-	if flag {
+	if !flag {
 		return false
 	}
 	return true

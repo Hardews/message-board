@@ -36,7 +36,7 @@ func Post(c *gin.Context) {
 		return
 	}
 
-	tool.RespSuccessfulWithDate(c, "发布")
+	tool.RespSuccessfulWithDate(c, "发布成功")
 }
 
 func DeletePost(c *gin.Context) {
