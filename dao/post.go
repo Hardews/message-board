@@ -25,7 +25,7 @@ func DeletePost(PostID int, userPost string) error {
 }
 
 func ChangePost(newPost string, PostID int) error {
-	sqlStr := "update userPost set userPost = ? where postID = ?"
+	sqlStr := "update userPost set userPost = ? where ID = ?"
 	_, err := dB.Exec(sqlStr, newPost, PostID)
 	if err != nil {
 		return err
