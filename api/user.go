@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"message-board/model"
@@ -149,6 +150,10 @@ func getInfo(c *gin.Context) {
 
 	userInfo, err := service.GetInfo(username)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			tool.RespErrorWithDate(c, "还没填写个人信息")
+			return
+		}
 		fmt.Println("get info failed, err :", err)
 		tool.RespInternetError(c)
 		return
