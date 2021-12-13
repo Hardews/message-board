@@ -15,7 +15,7 @@ func AddComment(commentUser model.Comment) error {
 }
 
 func DeleteComment(id, PostId int) error {
-	sqlStr := "delete comment from userComment where id = ? and PostID = ?"
+	sqlStr := "delete from userComment where id = ? and PostID = ?"
 	_, err := dB.Exec(sqlStr, id, PostId)
 	if err != nil {
 		return err
