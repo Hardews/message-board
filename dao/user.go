@@ -7,7 +7,7 @@ import (
 
 func SelectByUsername(username string) (error, model.User) {
 	var user model.User
-	sqlStr := "SELECT username,password FROM userInfo WHERE username = ?;"
+	sqlStr := "SELECT username,password FROM user_Info WHERE username = ?;"
 	err := dB.QueryRow(sqlStr, username).Scan(&user.Username, &user.Password)
 
 	if err != nil {
@@ -18,7 +18,7 @@ func SelectByUsername(username string) (error, model.User) {
 }
 
 func WriteIn(username, password string) error {
-	sqlStr := "insert into userInfo (username,password) values (?,?);"
+	sqlStr := "insert into user_Info (username,password) values (?,?);"
 	_, err := dB.Exec(sqlStr, username, password)
 	if err != nil {
 		return err
