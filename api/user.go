@@ -14,6 +14,10 @@ func Login(c *gin.Context) {
 	password := c.PostForm("password")
 	res, err := service.CheckPassword(username, password)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			tool.RespErrorWithDate(c, "无此账号")
+			return
+		}
 		fmt.Println(err)
 		tool.RespInternetError(c)
 		return
