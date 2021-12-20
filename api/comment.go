@@ -1,13 +1,15 @@
 package api
 
 import (
-	"database/sql"
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"time"
+
 	"message-board/model"
 	"message-board/service"
 	"message-board/tool"
-	"time"
+
+	"database/sql"
+	"github.com/gin-gonic/gin"
 )
 
 var commentUser model.Comment

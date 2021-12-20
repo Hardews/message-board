@@ -5,7 +5,7 @@ import (
 )
 
 func AddComment(commentUser model.Comment) error {
-	sqlStr := "insert into userComment (postid,commentName,comment) values (?,?,?)"
+	sqlStr := "insert into user_Comment (postid,commentName,comment) values (?,?,?)"
 	_, err := dB.Exec(sqlStr, commentUser.PostID, commentUser.Username, commentUser.Txt)
 	if err != nil {
 		return err
@@ -15,7 +15,7 @@ func AddComment(commentUser model.Comment) error {
 }
 
 func DeleteComment(id, PostId int) error {
-	sqlStr := "delete from userComment where id = ? and PostID = ?"
+	sqlStr := "delete from user_Comment where id = ? and PostID = ?"
 	_, err := dB.Exec(sqlStr, id, PostId)
 	if err != nil {
 		return err
@@ -24,7 +24,7 @@ func DeleteComment(id, PostId int) error {
 }
 
 func ChangeComment(newComment string, commentID int) error {
-	sqlStr := "update userComment set comment = ? where id = ? "
+	sqlStr := "update user_Comment set comment = ? where id = ? "
 	_, err := dB.Exec(sqlStr, newComment, commentID)
 	if err != nil {
 		return err
@@ -35,7 +35,7 @@ func ChangeComment(newComment string, commentID int) error {
 
 func SelectByCommentId(cUser model.Comment) (error, int) {
 	var id int
-	sqlStr := "select id from userComment where commentName = ? and comment = ? and postID = ?"
+	sqlStr := "select id from user_Comment where commentName = ? and comment = ? and postID = ?"
 	err := dB.QueryRow(sqlStr, cUser.Username, cUser.Txt, cUser.PostID).Scan(&id)
 	if err != nil {
 		return err, id
@@ -45,7 +45,7 @@ func SelectByCommentId(cUser model.Comment) (error, int) {
 
 func SelectByPostID(postName, userPost string) (int, error) {
 	var u model.Comment
-	sqlStr := "select id from userPost where username= ? and userPost= ?"
+	sqlStr := "select id from user_Post where username= ? and userPost= ?"
 	err := dB.QueryRow(sqlStr, postName, userPost).Scan(&u.PostID)
 	if err != nil {
 		return u.PostID, err

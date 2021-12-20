@@ -27,7 +27,7 @@ func WriteIn(username, password string) error {
 }
 
 func ChangePassword(username, password string) error {
-	sqlStr := "update userInfo set password = ? where username = ?;"
+	sqlStr := "update user_Info set password = ? where username = ?;"
 	_, err := dB.Exec(sqlStr, password, username)
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func ChangePassword(username, password string) error {
 }
 
 func WriteUserInfoIN(userInfo model.UserInfo, username string) error {
-	sqlStr := "insert into userExtraInfo (username,Name,Professional,School,Specialty) values (?,?,?,?,?);"
+	sqlStr := "insert into user_extra_info (username,Name,Professional,School,Specialty) values (?,?,?,?,?);"
 	_, err := dB.Exec(sqlStr, username, userInfo.Name, userInfo.Professional, userInfo.School, userInfo.Specialty)
 	if err != nil {
 		return err
@@ -46,7 +46,7 @@ func WriteUserInfoIN(userInfo model.UserInfo, username string) error {
 
 func GetUserInfo(username string) (model.UserInfo, error) {
 	var user model.UserInfo
-	sqlStr := "select * from userExtraInfo where username = ?"
+	sqlStr := "select * from user_extra_info where username = ?"
 	err := dB.QueryRow(sqlStr, username).Scan(&user.Id, &username, &user.Name, &user.Professional, &user.School, &user.Specialty)
 	if err != nil {
 		return user, err
@@ -55,7 +55,7 @@ func GetUserInfo(username string) (model.UserInfo, error) {
 }
 
 func ChangeUserInfo(userInfo model.UserInfo) error {
-	sqlStr := "update userExtraInfo set Name = ? ,Professional=? ,School=? ,Specialty=? where id = ?"
+	sqlStr := "update user_extra_info set Name = ? ,Professional=? ,School=? ,Specialty=? where id = ?"
 	_, err := dB.Exec(sqlStr, userInfo.Name, userInfo.Professional, userInfo.School, userInfo.Specialty, userInfo.Id)
 	if err != nil {
 		return err

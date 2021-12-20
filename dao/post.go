@@ -6,7 +6,7 @@ import (
 )
 
 func Post(username, userPost string) error {
-	sqlStr := "insert into userPost (username,userPost) values (?,?)"
+	sqlStr := "insert into user_Post (username,userPost) values (?,?)"
 	_, err := dB.Exec(sqlStr, username, userPost)
 	if err != nil {
 		return err
@@ -15,7 +15,7 @@ func Post(username, userPost string) error {
 }
 
 func DeletePost(PostID int, userPost string) error {
-	sqlStr := "update userPost set userPost = ? where id=?"
+	sqlStr := "update user_Post set userPost = ? where id=?"
 	userPost = userPost + "(已被删除)"
 	_, err := dB.Exec(sqlStr, userPost, PostID)
 	if err != nil {
@@ -25,7 +25,7 @@ func DeletePost(PostID int, userPost string) error {
 }
 
 func ChangePost(newPost string, PostID int) error {
-	sqlStr := "update userPost set userPost = ? where ID = ?"
+	sqlStr := "update user_Post set userPost = ? where ID = ?"
 	_, err := dB.Exec(sqlStr, newPost, PostID)
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func ChangePost(newPost string, PostID int) error {
 
 func SelectAllByPostId(postName, userPost string) (model.Post, error) {
 	var u model.Post
-	sqlStr := "select * from userPost where username= ? and userPost= ?"
+	sqlStr := "select * from user_Post where username= ? and userPost= ?"
 	err := dB.QueryRow(sqlStr, postName, userPost).Scan(&u.PostID, &u.Username, &u.Txt, &u.LikeNum, &u.PostTime)
 	if err != nil {
 		return u, err
@@ -47,7 +47,7 @@ func SelectAllByPostId(postName, userPost string) (model.Post, error) {
 func GetCommentsSection(PostID int) (error, []model.Comment) {
 	var comments []model.Comment
 
-	sqlStr := "select id,comment,time,commentName,commentLikeNum from usercomment where PostID = ?"
+	sqlStr := "select id,comment,time,commentName,commentLikeNum from user_comment where PostID = ?"
 	rows, err := dB.Query(sqlStr, PostID)
 	if err != nil {
 		return err, comments
@@ -68,7 +68,7 @@ func GetCommentsSection(PostID int) (error, []model.Comment) {
 
 func SelectAllPost() (error, []model.Post) {
 	var posts []model.Post
-	sqlStr := "select * from userPost"
+	sqlStr := "select * from user_Post"
 	rows, err := dB.Query(sqlStr)
 	if err != nil {
 		return err, posts
